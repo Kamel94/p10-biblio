@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>fr.biblio</groupId>
-		<artifactId>p7-biblio</artifactId>
+		<artifactId>p10-biblio</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<groupId>fr.biblio</groupId>

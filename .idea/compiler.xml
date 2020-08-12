@@ -27,7 +27,7 @@
       <module name="p10-biblio" target="1.8" />
       <module name="pret-service" target="1.8" />
       <module name="spring-admin" target="1.5" />
-      <module name="zuul-server" target="1.5" />
+      <module name="zuul-server" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

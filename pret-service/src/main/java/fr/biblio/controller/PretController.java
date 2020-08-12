@@ -165,14 +165,18 @@ public class PretController {
                           @PathVariable("exemplaireId") long exemplaireId) {
 
         Pret pret = new Pret();
+        Pret pretWithStatutPret = pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, Constantes.PRET);
+        Pret pretWithStatutEnAttente = pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, Constantes.EN_ATTENTE);
         List<Pret> prets = pretRepository.findPretByStatut(Constantes.EN_ATTENTE);
         ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(exemplaireId);
-        List<Pret> pretsByExplaireId = pretRepository.findByStatutAndExemplaireId(Constantes.PRET, exemplaireId);
+        List<Pret> pretsByExemplaireId = pretRepository.findByStatutAndExemplaireId(Constantes.PRET, exemplaireId);
 
-        int nombreExemplaire = exemplaireLivre.getNombreExemplaire() + pretsByExplaireId.size();
+        int nombreExemplaire = exemplaireLivre.getNombreExemplaire() + pretsByExemplaireId.size();
         System.out.println(nombreExemplaire);
         System.out.println(prets.size());
-        if(!exemplaireLivre.isDisponibilite() && nombreExemplaire * 2 > prets.size()) {
+
+        if(!exemplaireLivre.isDisponibilite() && nombreExemplaire * 2 > prets.size() &&
+                pretWithStatutEnAttente != null && pretWithStatutPret != null) {
             log.info("L'exemplaire '" + exemplaireLivre.getLivre().getTitre() + "' n'est pas disponible..." +
                     "\nOn vous préviendra une fois qu'il sera de nouveau disponible.");
             pret.setDatePret(new Date());
@@ -182,11 +186,13 @@ public class PretController {
             pret.setExemplaireId(exemplaireLivre.getId());
             pret.setStatut(Constantes.EN_ATTENTE);
 
-        } else if (nombreExemplaire * 2 <= prets.size()) {
+        } else if (nombreExemplaire * 2 <= prets.size() && pretWithStatutEnAttente != null
+                && pretWithStatutPret != null) {
             log.info("L'exemplaire '" + exemplaireLivre.getLivre().getTitre() + "' n'est pas disponible...");
             System.out.println(nombreExemplaire);
             return null;
-        } else {
+
+        } else if (pretWithStatutPret == null && pretWithStatutEnAttente == null) {
             exemplaireLivre.setNombreExemplaire(exemplaireLivre.getNombreExemplaire() - 1);
 
             if (exemplaireLivre.getNombreExemplaire() == 0) {
@@ -212,6 +218,9 @@ public class PretController {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else {
+            log.info("Vous avez déjà un emprunt en cours sur ce livre.");
+            return null;
         }
         return pretRepository.save(pret);
     }

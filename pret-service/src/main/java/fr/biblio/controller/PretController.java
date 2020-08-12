@@ -79,28 +79,44 @@ public class PretController {
     @PostMapping(value = "/livreRendu/{pretId}")
     public Pret rendreLivre(@PathVariable("pretId") long pretId) {
 
+        List<Pret> prets = pretRepository.findPretByStatut(Constantes.EN_ATTENTE);
         Pret pret = pretRepository.findById(pretId).get();
+        ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(pret.getExemplaireId());
+        int i = 0;
 
-        if (pret.getStatut().equals(Constantes.PRET)) {
+        if (pret.getStatut().equals(Constantes.PRET) || pret.getStatut().equals(Constantes.MIS_A_DISPO)) {
 
-            ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(pret.getExemplaireId());
-
-            exemplaireLivre.setNombreExemplaire(exemplaireLivre.getNombreExemplaire() + 1);
+            if (prets.isEmpty()) {
+                exemplaireLivre.setNombreExemplaire(exemplaireLivre.getNombreExemplaire() + 1);
+            }
 
             if (exemplaireLivre.getNombreExemplaire() > 0) {
                 exemplaireLivre.setDisponibilite(true);
             }
 
             pretProxy.updateExemplaire(exemplaireLivre);
-
             pret.setStatut(Constantes.RENDU);
             pret.setDateRetour(new Date());
 
-            return pretRepository.save(pret);
+                if (!prets.isEmpty() && pret.getExemplaireId() == prets.get(i).getExemplaireId()) {
+                    try {
+                        GregorianCalendar date = new GregorianCalendar();
+
+                        date.setTime(prets.get(i).getDatePret());
+                        date.add(GregorianCalendar.DAY_OF_YEAR, + 28);
+
+                        prets.get(i).setStatut(Constantes.MIS_A_DISPO);
+                        prets.get(i).setDateRetour(date.getTime());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return pretRepository.save(prets.get(i));
+                }
+
         } else {
             log.info("Ce prêt n'est pas en cours...");
         }
-        return null;
+        return pretRepository.save(pret);
     }
 
     /**
@@ -149,13 +165,28 @@ public class PretController {
                           @PathVariable("exemplaireId") long exemplaireId) {
 
         Pret pret = new Pret();
+        List<Pret> prets = pretRepository.findPretByStatut(Constantes.EN_ATTENTE);
         ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(exemplaireId);
+        List<Pret> pretsByExplaireId = pretRepository.findByStatutAndExemplaireId(Constantes.PRET, exemplaireId);
 
-        if(!exemplaireLivre.isDisponibilite()) {
+        int nombreExemplaire = exemplaireLivre.getNombreExemplaire() + pretsByExplaireId.size();
+        System.out.println(nombreExemplaire);
+        System.out.println(prets.size());
+        if(!exemplaireLivre.isDisponibilite() && nombreExemplaire * 2 > prets.size()) {
+            log.info("L'exemplaire '" + exemplaireLivre.getLivre().getTitre() + "' n'est pas disponible..." +
+                    "\nOn vous préviendra une fois qu'il sera de nouveau disponible.");
+            pret.setDatePret(new Date());
+            pret.setUtilisateurId(utilisateurId);
+            pret.setDateRetour(new Date());
+            pret.setProlongation(0);
+            pret.setExemplaireId(exemplaireLivre.getId());
+            pret.setStatut(Constantes.EN_ATTENTE);
+
+        } else if (nombreExemplaire * 2 <= prets.size()) {
             log.info("L'exemplaire '" + exemplaireLivre.getLivre().getTitre() + "' n'est pas disponible...");
-
+            System.out.println(nombreExemplaire);
+            return null;
         } else {
-
             exemplaireLivre.setNombreExemplaire(exemplaireLivre.getNombreExemplaire() - 1);
 
             if (exemplaireLivre.getNombreExemplaire() == 0) {
@@ -176,14 +207,13 @@ public class PretController {
                 pret.setDateRetour(date.getTime());
                 pret.setProlongation(0);
                 pret.setExemplaireId(exemplaireLivre.getId());
-                pret.setStatut("PRET");
+                pret.setStatut(Constantes.PRET);
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return pretRepository.save(pret);
         }
-        return null;
+        return pretRepository.save(pret);
     }
 
 }

@@ -32,15 +32,15 @@ public class ApplicationController {
 
     @GetMapping("/accueil")
     public String accueil(Model model, Principal principal,
-                          @RequestParam(name="titre", defaultValue = "") String titre,
-                          @RequestParam(name="auteur", defaultValue = "") String auteur,
-                          @RequestParam(name="categorie", defaultValue = "") String categorie) {
+                          @RequestParam(name = "titre", defaultValue = "") String titre,
+                          @RequestParam(name = "auteur", defaultValue = "") String auteur,
+                          @RequestParam(name = "categorie", defaultValue = "") String categorie) {
 
 
         List<Livre> livres = webProxy.chercherLivreParCriteres(titre, auteur, categorie);
 
         if (principal != null) {
-            Utilisateur utilisateur = webProxy.getUtilisateurWithEmail(principal.getName());
+            Utilisateur utilisateur = webProxy.getUtilisateurWithPseudo(principal.getName());
             model.addAttribute("utilisateur", utilisateur);
         } else {
             Utilisateur utilisateur = new Utilisateur();
@@ -63,24 +63,73 @@ public class ApplicationController {
     public String detailsLivre(@PathVariable("id") long id, Model model, Principal principal) {
 
         Livre livre = webProxy.getLivre(id);
-        List<ExemplaireLivre> exemplaireLivre = webProxy.getExemplairesWithLivreId(id);
+        ExemplaireLivre exemplaire = webProxy.getExemplaireWithLivreId(id);
+        List<Pret> prets = webProxy.getPretsWithStatutPretAndExemplaireId(exemplaire.getId());
+        List<Pret> pretsOrderByDate = webProxy.getPretsOrderByDateRetourAsc(exemplaire.getId());
+        List<Pret> statutAttente = webProxy.getPretsWithStatutAndExemplaireId("EN ATTENTE", exemplaire.getId());
+
         String formatDate = "dd/MM/yyyy";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatDate);
+        String date = simpleDateFormat.format(livre.getEdition());
+        livre.setEditionString(date);
+        int nombreExemplaire = (exemplaire.getNombreExemplaire() + prets.size()) * 2;
+        System.out.println(nombreExemplaire);
+        System.out.println(exemplaire.getNombreExemplaire());
 
-        if (principal == null){
+        if (principal == null) {
             Utilisateur utilisateur = new Utilisateur();
             utilisateur.setId(Long.valueOf(0));
             model.addAttribute("utilisateur", utilisateur);
         } else {
-            Utilisateur utilisateur = webProxy.getUtilisateurWithEmail(principal.getName());
+            Utilisateur utilisateur = webProxy.getUtilisateurWithPseudo(principal.getName());
+
+                Pret pret = webProxy.findByUtilisateurIdAndExemplaireIdAndStatutNotLike(utilisateur.getId(), exemplaire.getId(), "RENDU");
+
+                if (pret == null) {
+                    Pret newPret = new Pret();
+                    newPret.setUtilisateurId(Long.valueOf(0));
+                    model.addAttribute("p", newPret);
+                } else {
+                    model.addAttribute("p", pret);
+                }
             model.addAttribute("utilisateur", utilisateur);
         }
 
-        String date = simpleDateFormat.format(livre.getEdition());
-        livre.setEditionString(date);
+        if (statutAttente.size() != 0) {
+            int sizeListAttente = statutAttente.size();
+            model.addAttribute("statutAttente", statutAttente);
+            model.addAttribute("sizeListAttente", sizeListAttente);
+            System.out.println(statutAttente.size() + " 1");
+        } else {
+            Pret pret1 = new Pret(Long.valueOf(0), new Date(), new Date(), null, 0, Long.valueOf(0), Long.valueOf(0));
+            statutAttente.add(pret1);
+            int sizeListAttente = statutAttente.size() - 1;
+            model.addAttribute("statutAttente", statutAttente);
+            model.addAttribute("sizeListAttente", sizeListAttente);
+            System.out.println(statutAttente.size() + " 0");
+            System.out.println(sizeListAttente + " 0");
+        }
 
+        if (pretsOrderByDate.size() != 0) {
+            String dateRetour = simpleDateFormat.format(pretsOrderByDate.get(0).getDateRetour());
+            int sizeList = pretsOrderByDate.size();
+            pretsOrderByDate.get(0).setDateRetourString(dateRetour);
+            model.addAttribute("pretsOrderByDate", pretsOrderByDate);
+            model.addAttribute("sizeList", sizeList);
+        } else {
+            Pret pret1 = new Pret(Long.valueOf(0), new Date(), new Date(), null, 0, Long.valueOf(0), Long.valueOf(0));
+            pretsOrderByDate.add(pret1);
+            int sizeList = pretsOrderByDate.size() - 1;
+            pretsOrderByDate.get(0).setDateRetourString("//");
+            model.addAttribute("pretsOrderByDate", pretsOrderByDate);
+            model.addAttribute("sizeList", sizeList);
+        }
+
+        model.addAttribute("nombreExemplaire", nombreExemplaire);
+        model.addAttribute("prets", prets);
+        model.addAttribute("exemplaire", exemplaire);
+        model.addAttribute("livre", livre);
         model.addAttribute("pret", new Pret());
-        model.addAttribute("exemplaires", exemplaireLivre);
         model.addAttribute("livre", livre);
         model.addAttribute("localDate", LocalDate.now());
 
@@ -122,13 +171,26 @@ public class ApplicationController {
     /**
      * Permet aux usagers de prolonger un emprunt.
      */
-    @GetMapping(value = "/prolongation/{pretId}/{utilisateurId}")
+    @PostMapping(value = "/prolongation/{pretId}/{utilisateurId}")
     public String prolongation(@PathVariable("pretId") long pretId,
                                @PathVariable("utilisateurId") long utilisateurId) {
 
         Pret prolongation = webProxy.prolongerPret(pretId);
 
         return "redirect:/usager/pretUtilisateur/{utilisateurId}";
+    }
+
+    /**
+     * Permet aux usagers de demander un emprunt.
+     */
+    @GetMapping(value = "/usager/ajoutPret/{utilisateurId}/{exemplaireId}/{livreId}")
+    public String addPret(@PathVariable("exemplaireId") long exemplaireId,
+                          @PathVariable("utilisateurId") long utilisateurId,
+                          @PathVariable("livreId") long livreId) {
+
+        webProxy.addPret(utilisateurId, exemplaireId);
+
+        return "redirect:/detailsLivre/{livreId}";
     }
 
     /**
@@ -142,8 +204,8 @@ public class ApplicationController {
         model.addAttribute("utilisateur", new Utilisateur());
         model.addAttribute("localDate", dateTime);
 
-        if(principal != null) {
-            Utilisateur utilisateur = webProxy.getUtilisateurWithEmail(principal.getName());
+        if (principal != null) {
+            Utilisateur utilisateur = webProxy.getUtilisateurWithPseudo(principal.getName());
             model.addAttribute("u", utilisateur);
         } else {
             Utilisateur utilisateur = new Utilisateur();
@@ -158,9 +220,9 @@ public class ApplicationController {
      * Méthode qui permet d'enregistrer l'inscription ou
      * de renvoyer vers le formulaire d'inscription en cas d'erreur.
      */
-    @RequestMapping(value="/enregistrer", method=RequestMethod.POST)
+    @RequestMapping(value = "/enregistrer", method = RequestMethod.POST)
     public String enregistrer(Model model, @Valid Utilisateur utilisateur, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             log.warn("Erreur lors de l'inscription " + bindingResult.getFieldError());
             return "redirect:/inscription";
         }

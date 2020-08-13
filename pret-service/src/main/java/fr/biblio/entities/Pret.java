@@ -35,5 +35,7 @@ public class Pret implements Serializable {
     private String dateRetourString;
     @Transient
     private int numeroSerieExemplaire;
+    @Transient
+    private int nombreExemplaire;
 
 }

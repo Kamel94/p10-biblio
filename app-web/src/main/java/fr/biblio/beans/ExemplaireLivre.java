@@ -21,4 +21,6 @@ public class ExemplaireLivre {
     private Livre livre;
     private Bibliotheque bibliotheque;
 
+    private long utilisateurId;
+
 }

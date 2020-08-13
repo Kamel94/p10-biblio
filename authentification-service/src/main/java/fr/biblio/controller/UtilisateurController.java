@@ -52,6 +52,14 @@ public class UtilisateurController {
     }
 
     /**
+     * Cherche un utilisateur avec son pseudo.
+     */
+    @GetMapping(value = "/utilisateurByPseudo/{pseudo}")
+    public Utilisateur getUtilisateurWithPseudo(@PathVariable("pseudo") String pseudo) {
+        return utilisateurRepository.findByPseudo(pseudo);
+    }
+
+    /**
      * Enregistre un utilisateur et encode son mot de passe.
      */
     @PostMapping(value = "/ajoutUtilisateur")

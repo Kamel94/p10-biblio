@@ -20,8 +20,14 @@ public interface WebProxy {
                               @RequestParam(name="auteur", defaultValue = "") String auteur,
                               @RequestParam(name="categorie", defaultValue = "") String categorie);
 
-    @GetMapping(value = "/livre-service/exemplaireLivres/{livreId}")
-    List<ExemplaireLivre> getExemplairesWithLivreId(@PathVariable("livreId") long id);
+    @GetMapping(value = "/livre-service/listExemplaireLivres/{livreId}")
+    List<ExemplaireLivre> getListExemplairesWithLivreId(@PathVariable("livreId") long id);
+
+    @GetMapping("/livre-service/exemplaireLivres/{livreId}")
+    ExemplaireLivre getExemplaireWithLivreId(@PathVariable("livreId") long id);
+
+    @GetMapping("/livre-service/exemplaireLivre/{id}")
+    ExemplaireLivre getExemplaire(@PathVariable("id") long id);
 
     @GetMapping(value = "/authentification-service/listeUtilisateurs")
     List<Utilisateur> listeUtilisateurs();
@@ -32,14 +38,46 @@ public interface WebProxy {
     @GetMapping(value = "/authentification-service/utilisateurByEmail/{email}")
     Utilisateur getUtilisateurWithEmail(@PathVariable("email") String email);
 
+    @GetMapping(value = "/authentification-service/utilisateurByPseudo/{pseudo}")
+    Utilisateur getUtilisateurWithPseudo(@PathVariable("pseudo") String pseudo);
+
     @PostMapping(value = "/authentification-service/ajoutUtilisateur")
     Utilisateur ajouterUtilisateur(@RequestBody Utilisateur utilisateur);
+
+    @GetMapping(value = "/pret-service/prets/{id}")
+    Pret getPret(@PathVariable("id") long id);
+
+    @GetMapping(value = "/pret-service/prets/{utilisateurId}/{exemplaireId}/{statut}")
+    Pret getPretWithUtilisateurIdAndExemplaireIdAndStatut(@PathVariable("utilisateurId") long utilisateurId,
+                                                                 @PathVariable("exemplaireId") long exemplaireId,
+                                                                 @PathVariable("statut") String statut);
+
+    @GetMapping(value = "/pret-service/prets/{utilisateurId}/{exemplaireId}/notLike/{statut}")
+    Pret findByUtilisateurIdAndExemplaireIdAndStatutNotLike(@PathVariable("utilisateurId") long utilisateurId,
+                                                 @PathVariable("exemplaireId") long exemplaireId,
+                                                 @PathVariable("statut") String statut);
 
     @RequestMapping(value = "/pret-service/prets")
     List<Pret> listeDesPrets();
 
+    @GetMapping(value = "/pret-service/pretsByStatut/{statut}")
+    List<Pret> getPretsByStatut(@PathVariable("statut") String statut);
+
     @GetMapping(value = "/pret-service/pretUtilisateur/{utilisateurId}")
     List<Pret> getPretsWithUtilisateurId(@PathVariable("utilisateurId") long utilisateurId);
+
+    @GetMapping(value = "/pret-service/pretsWithStatutPretAndExemplaireId/{exemplaireId}")
+    List<Pret> getPretsWithStatutPretAndExemplaireId(@PathVariable("exemplaireId") long exemplaireId);
+
+    @GetMapping(value = "/pret-service/pretsOrderByDateRetourAsc/{exemplaireId}")
+    List<Pret> getPretsOrderByDateRetourAsc(@PathVariable("exemplaireId") long exemplaireId);
+
+    @GetMapping(value = "/pret-service/pretsWithStatutAndExemplaireId/{statut}/{exemplaireId}")
+    List<Pret> getPretsWithStatutAndExemplaireId(@PathVariable("statut") String statut, @PathVariable("exemplaireId") long exemplaireId);
+
+    @PostMapping(value = "/pret-service/ajoutPret/{utilisateurId}/{exemplaireId}")
+    Pret addPret(@PathVariable("utilisateurId") long utilisateurId,
+                        @PathVariable("exemplaireId") long exemplaireId);
 
     @PostMapping(value = "/pret-service/prolongation/{pretId}")
     Pret prolongerPret(@PathVariable("pretId") long pretId);

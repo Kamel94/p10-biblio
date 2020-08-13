@@ -44,6 +44,26 @@ public class PretController {
     }
 
     /**
+     * Affiche un prêt de par son l'ID de l'utilisateur, l'ID de l'exemplaire et le statut.
+     */
+    @GetMapping(value = "/prets/{utilisateurId}/{exemplaireId}/{statut}")
+    public Pret getPretWithUtilisateurIdAndExemplaireIdAndStatut(@PathVariable("utilisateurId") long utilisateurId,
+                                                                 @PathVariable("exemplaireId") long exemplaireId,
+                                                                 @PathVariable("statut") String statut) {
+        return pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, statut);
+    }
+
+    /**
+     * Affiche un prêt de par son l'ID de l'utilisateur et l'ID de l'exemplaire.
+     */
+    @GetMapping(value = "/prets/{utilisateurId}/{exemplaireId}/notLike/{statut}")
+    public Pret getPretWithUtilisateurIdAndExemplaireId(@PathVariable("utilisateurId") long utilisateurId,
+                                                        @PathVariable("exemplaireId") long exemplaireId,
+                                                        @PathVariable("statut") String statut) {
+        return pretRepository.findByUtilisateurIdAndExemplaireIdAndStatutNotLike(utilisateurId, exemplaireId, statut);
+    }
+
+    /**
      * Affiche la liste des prêts d'un utilisateur.
      */
     @GetMapping(value = "/pretUtilisateur/{utilisateurId}")
@@ -59,6 +79,56 @@ public class PretController {
             pret.setNumeroSerieExemplaire(exemplaireLivre.getNumeroSerie());
             pret.setNomBiblio(bibliotheque.getNom());
         }
+        return prets;
+    }
+
+    /**
+     * Affiche la liste des prêts avec le statut "PRET" et l'id de l'exemplaire.
+     */
+    @GetMapping(value = "/pretsWithStatutPretAndExemplaireId/{exemplaireId}")
+    public List<Pret> getPretsWithStatutPretAndExemplaireId(@PathVariable("exemplaireId") long exemplaireId) {
+
+        List<Pret> prets = pretRepository.findByStatutAndExemplaireId(Constantes.PRET, exemplaireId);
+        for (Pret pret : prets) {
+            ExemplaireLivre exemplaire = pretProxy.getExemplaire(pret.getExemplaireId());
+            LivreBean livre = pretProxy.getLivre(exemplaire.getLivreId());
+            Bibliotheque bibliotheque = pretProxy.getBibliotheque(exemplaire.getBibliothequeId());
+
+            pret.setTitreLivre(livre.getTitre());
+            pret.setNumeroSerieExemplaire(exemplaire.getNumeroSerie());
+            pret.setNomBiblio(bibliotheque.getNom());
+            pret.setNombreExemplaire(exemplaire.getNombreExemplaire());
+        }
+        return prets;
+    }
+
+    /**
+     * Affiche la liste des prêts avec le statut "PRET" et l'id de l'exemplaire.
+     */
+    @GetMapping(value = "/pretsOrderByDateRetourAsc/{exemplaireId}")
+    public List<Pret> getPretsOrderByDateRetourAsc(@PathVariable("exemplaireId") long exemplaireId) {
+
+        List<Pret> prets = pretRepository.findPretByStatutAndExemplaireIdOrderByDateRetourAsc(Constantes.PRET, exemplaireId);
+        return prets;
+    }
+
+    /**
+     * Affiche la liste des prêts avec le statut et l'id de l'exemplaire.
+     */
+    @GetMapping(value = "/pretsWithStatutAndExemplaireId/{statut}/{exemplaireId}")
+    public List<Pret> getPretsWithStatutAndExemplaireId(@PathVariable("statut") String statut, @PathVariable("exemplaireId") long exemplaireId) {
+
+        List<Pret> prets = pretRepository.findByStatutAndExemplaireId(statut, exemplaireId);
+        return prets;
+    }
+
+    /**
+     * Affiche la liste des prêts par le statut.
+     */
+    @GetMapping(value = "/pretsByStatut/{statut}")
+    public List<Pret> getPretsByStatut(@PathVariable("statut") String statut) {
+
+        List<Pret> prets = pretRepository.findPretByStatut(statut);
         return prets;
     }
 
@@ -156,16 +226,15 @@ public class PretController {
         Pret pret = new Pret();
         Pret pretWithStatutPret = pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, Constantes.PRET);
         Pret pretWithStatutEnAttente = pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, Constantes.EN_ATTENTE);
-        List<Pret> prets = pretRepository.findPretByStatut(Constantes.EN_ATTENTE);
         ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(exemplaireId);
         List<Pret> pretsByExemplaireId = pretRepository.findByStatutAndExemplaireId(Constantes.PRET, exemplaireId);
+        List<Pret> prets = pretRepository.findByStatutAndExemplaireId(Constantes.EN_ATTENTE, exemplaireId);
 
         int nombreExemplaire = exemplaireLivre.getNombreExemplaire() + pretsByExemplaireId.size();
         System.out.println(nombreExemplaire);
         System.out.println(prets.size());
 
-        if(!exemplaireLivre.isDisponibilite() && nombreExemplaire * 2 > prets.size() &&
-                pretWithStatutEnAttente != null && pretWithStatutPret != null) {
+        if(exemplaireLivre.getNombreExemplaire() == 0 && nombreExemplaire * 2 > prets.size()) {
             log.info("L'exemplaire '" + exemplaireLivre.getLivre().getTitre() + "' n'est pas disponible..." +
                     "\nOn vous préviendra une fois qu'il sera de nouveau disponible.");
             pret.setDatePret(new Date());
@@ -181,7 +250,7 @@ public class PretController {
             System.out.println(nombreExemplaire);
             return null;
 
-        } else if (pretWithStatutPret == null && pretWithStatutEnAttente == null) {
+        } else if (exemplaireLivre.getNombreExemplaire() > 0 && pretWithStatutPret == null && pretWithStatutEnAttente == null) {
             exemplaireLivre.setNombreExemplaire(exemplaireLivre.getNombreExemplaire() - 1);
 
             if (exemplaireLivre.getNombreExemplaire() == 0) {

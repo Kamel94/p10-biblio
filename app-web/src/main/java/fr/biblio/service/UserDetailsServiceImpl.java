@@ -43,7 +43,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         log.info("pseudo = " + utilisateur.getPseudo() + " pass = " + utilisateur.getPassword()
                 + " Statut = " + utilisateur.getStatut());
-
         return new User(utilisateur.getPseudo(), utilisateur.getPassword(), authorities);
     }
 }

@@ -51,5 +51,6 @@ public class Pret {
     private int numeroSerieExemplaire;
     private String titreLivre;
     private String nomBiblio;
+    private int nombreExemplaire;
 
 }

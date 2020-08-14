@@ -66,6 +66,9 @@ public interface WebProxy {
     @GetMapping(value = "/pret-service/pretUtilisateur/{utilisateurId}")
     List<Pret> getPretsWithUtilisateurId(@PathVariable("utilisateurId") long utilisateurId);
 
+    @GetMapping(value = "/pret-service/pretUtilisateur/{utilisateurId}/{statut}")
+    List<Pret> getPretsWithUtilisateurIdAndStatut(@PathVariable("utilisateurId") long utilisateurId, @PathVariable("statut") String statut);
+
     @GetMapping(value = "/pret-service/pretsWithStatutPretAndExemplaireId/{exemplaireId}")
     List<Pret> getPretsWithStatutPretAndExemplaireId(@PathVariable("exemplaireId") long exemplaireId);
 
@@ -81,5 +84,8 @@ public interface WebProxy {
 
     @PostMapping(value = "/pret-service/prolongation/{pretId}")
     Pret prolongerPret(@PathVariable("pretId") long pretId);
+
+    @PostMapping(value = "/pret-service/delete/{id}")
+    Pret delete(@PathVariable("id") long id);
 
 }

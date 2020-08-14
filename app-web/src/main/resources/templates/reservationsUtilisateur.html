@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Exemplaire</title>
+    <link rel="stylesheet" type="text/css"
+          href="../static/css/bootstrap.min.css"
+          th:href="@{/css/bootstrap.min.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+</head>
+<body>
+
+<body>
+<br>
+<div layout:fragment="content">
+<div class="container">
+    <div class="card mt-3">
+        <div class="card-header">Mes réservations en cours</div>
+        <div class="card-body">
+            <div th:each="pret : ${pretEnAttente}">
+                <table class="table text-info mt-3">
+                    <tbody>
+                    <tr class="text-center bg-info">
+                        <td><a th:href="@{/usager/reservationsUtilisateur/information/{utilisateurId}/{exemplaireId}(utilisateurId=${utilisateur.id}, exemplaireId=${pret.exemplaireId})}"
+                               class="text-light text-center">[[${pret.titreLivre}]] </a> &nbsp; &nbsp; &nbsp; </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+</html>

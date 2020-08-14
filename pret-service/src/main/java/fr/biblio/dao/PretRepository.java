@@ -23,4 +23,6 @@ public interface PretRepository extends JpaRepository<Pret, Long> {
     Pret findByUtilisateurIdAndExemplaireIdAndStatut(long utilisateurId, long exemplaireId, String statut);
 
     Pret findByUtilisateurIdAndExemplaireIdAndStatutNotLike(long utilisateurId, long exemplaireId, String statut);
+
+    Pret deleteById(long id);
 }

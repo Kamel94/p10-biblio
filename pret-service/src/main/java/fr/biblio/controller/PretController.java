@@ -65,7 +65,7 @@ public class PretController {
     }
 
     /**
-     * Affiche la liste des prêts d'un utilisateur.
+     * Affiche la liste des prêts d'un utilisateur avec le statut "PRET".
      */
     @GetMapping(value = "/pretUtilisateur/{utilisateurId}")
     public List<Pret> getPretsWithUtilisateurId(@PathVariable("utilisateurId") long utilisateurId) {
@@ -80,6 +80,16 @@ public class PretController {
             pret.setNumeroSerieExemplaire(exemplaireLivre.getNumeroSerie());
             pret.setNomBiblio(bibliotheque.getNom());
         }
+        return prets;
+    }
+
+    /**
+     * Affiche la liste des prêts d'un utilisateur.
+     */
+    @GetMapping(value = "/pretUtilisateur/{utilisateurId}/{statut}")
+    public List<Pret> getPretsWithUtilisateurIdAndStatut(@PathVariable("utilisateurId") long utilisateurId, @PathVariable("statut") String statut) {
+
+        List<Pret> prets = pretRepository.findByUtilisateurIdAndStatut(utilisateurId, statut);
         return prets;
     }
 
@@ -292,6 +302,14 @@ public class PretController {
             return null;
         }
         return pretRepository.save(pret);
+    }
+
+    /**
+     * Supprime un prêt.
+     */
+    @PostMapping(value = "/delete/{id}")
+    public Pret delete(@PathVariable("id") long id) {
+        return pretRepository.deleteById(id);
     }
 
 }

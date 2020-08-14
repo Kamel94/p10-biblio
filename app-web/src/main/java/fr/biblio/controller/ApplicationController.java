@@ -6,6 +6,7 @@ import fr.biblio.service.CompteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -83,15 +84,15 @@ public class ApplicationController {
         } else {
             Utilisateur utilisateur = webProxy.getUtilisateurWithPseudo(principal.getName());
 
-                Pret pret = webProxy.findByUtilisateurIdAndExemplaireIdAndStatutNotLike(utilisateur.getId(), exemplaire.getId(), "RENDU");
+            Pret pret = webProxy.findByUtilisateurIdAndExemplaireIdAndStatutNotLike(utilisateur.getId(), exemplaire.getId(), "RENDU");
 
-                if (pret == null) {
-                    Pret newPret = new Pret();
-                    newPret.setUtilisateurId(Long.valueOf(0));
-                    model.addAttribute("p", newPret);
-                } else {
-                    model.addAttribute("p", pret);
-                }
+            if (pret == null) {
+                Pret newPret = new Pret();
+                newPret.setUtilisateurId(Long.valueOf(0));
+                model.addAttribute("p", newPret);
+            } else {
+                model.addAttribute("p", pret);
+            }
             model.addAttribute("utilisateur", utilisateur);
         }
 
@@ -169,6 +170,112 @@ public class ApplicationController {
     }
 
     /**
+     * Affiche la liste des réservations en cours de l'utilisateur connecté.
+     */
+    @GetMapping(value = "/usager/reservationsUtilisateur/{utilisateurId}")
+    public String reservationUtilisateur(Model model,
+                                         @PathVariable("utilisateurId") long utilisateurId) {
+
+        List<Pret> pretEnAttente = webProxy.getPretsWithUtilisateurIdAndStatut(utilisateurId, "EN ATTENTE");
+
+        Utilisateur utilisateur = webProxy.getUtilisateur(utilisateurId);
+
+        String formatDate = "dd/MM/yyyy";
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatDate);
+
+        try {
+            for (Pret pret : pretEnAttente) {
+                List<Pret> pretsOrderByDate = webProxy.getPretsOrderByDateRetourAsc(pret.getExemplaireId());
+                List<Pret> listeAttente = webProxy.getPretsWithStatutAndExemplaireId("EN ATTENTE", pret.getExemplaireId());
+                ExemplaireLivre exemplaireLivre = webProxy.getExemplaire(pret.getExemplaireId());
+                Livre livre = webProxy.getLivre(exemplaireLivre.getLivreId());
+
+                if (listeAttente.size() != 0) {
+                    int sizeListAttente = listeAttente.size();
+                    model.addAttribute("statutAttente", listeAttente);
+                    model.addAttribute("sizeListAttente", sizeListAttente);
+                } else {
+                    Pret pret1 = new Pret(Long.valueOf(0), new Date(), new Date(), null, 0, Long.valueOf(0), Long.valueOf(0));
+                    listeAttente.add(pret1);
+                    int sizeListAttente = listeAttente.size() - 1;
+                    model.addAttribute("statutAttente", listeAttente);
+                    model.addAttribute("sizeListAttente", sizeListAttente);
+                }
+
+                if (pretsOrderByDate.size() != 0) {
+                    String dateRetour = simpleDateFormat.format(pretsOrderByDate.get(0).getDateRetour());
+                    int sizeList = pretsOrderByDate.size();
+                    pretsOrderByDate.get(0).setDateRetourString(dateRetour);
+                    model.addAttribute("pretsOrderByDate", pretsOrderByDate);
+                    model.addAttribute("sizeList", sizeList);
+                } else {
+                    Pret pret1 = new Pret(Long.valueOf(0), new Date(), new Date(), null, 0, Long.valueOf(0), Long.valueOf(0));
+                    pretsOrderByDate.add(pret1);
+                    int sizeList = pretsOrderByDate.size() - 1;
+                    pretsOrderByDate.get(0).setDateRetourString("//");
+                    model.addAttribute("pretsOrderByDate", pretsOrderByDate);
+                    model.addAttribute("sizeList", sizeList);
+                }
+
+                pret.setTitreLivre(livre.getTitre());
+                pret.setNumeroSerieExemplaire(exemplaireLivre.getNumeroSerie());
+                String date = simpleDateFormat.format(pret.getDateRetour());
+                pret.setDateRetourString(date);
+
+                model.addAttribute("date", date);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        model.addAttribute("today", new Date());
+        model.addAttribute("pretEnAttente", pretEnAttente);
+        model.addAttribute("utilisateur", utilisateur);
+
+        return "reservationsUtilisateur";
+    }
+
+    /**
+     * Affiche les informations de la réservation en cours de l'utilisateur connecté.
+     */
+    @GetMapping(value = "/usager/reservationsUtilisateur/information/{utilisateurId}/{exemplaireId}")
+    public String infosReservation(Model model, @PathVariable("utilisateurId") long utilisateurId,
+                                   @PathVariable("exemplaireId") long exemplaireId) {
+
+        String formatDate = "dd/MM/yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatDate);
+        List<Pret> pretsOrderByDate = webProxy.getPretsOrderByDateRetourAsc(exemplaireId);
+        List<Pret> listeAttente = webProxy.getPretsWithStatutAndExemplaireId("EN ATTENTE", exemplaireId);
+        Pret pretUtilisateur = webProxy.getPretWithUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, "EN ATTENTE");
+        ExemplaireLivre exemplaireLivre = webProxy.getExemplaire(exemplaireId);
+        Livre livre = webProxy.getLivre(exemplaireLivre.getLivreId());
+
+        if (listeAttente.size() != 0) {
+            model.addAttribute("listeAttente", listeAttente);
+        } else {
+            Pret pret1 = new Pret(Long.valueOf(0), new Date(), new Date(), null, 0, Long.valueOf(0), Long.valueOf(0));
+            listeAttente.add(pret1);
+            model.addAttribute("listeAttente", listeAttente);
+        }
+
+        if (pretsOrderByDate.size() != 0) {
+            String dateRetour = simpleDateFormat.format(pretsOrderByDate.get(0).getDateRetour());
+            pretsOrderByDate.get(0).setDateRetourString(dateRetour);
+            model.addAttribute("pretsOrderByDate", pretsOrderByDate);
+        } else {
+            Pret pret1 = new Pret(Long.valueOf(0), new Date(), new Date(), null, 0, Long.valueOf(0), Long.valueOf(0));
+            pretsOrderByDate.add(pret1);
+            pretsOrderByDate.get(0).setDateRetourString("//");
+            model.addAttribute("pretsOrderByDate", pretsOrderByDate);
+        }
+        model.addAttribute("livre", livre);
+        model.addAttribute("pretUtilisateur", pretUtilisateur);
+
+        return "infosReservation";
+    }
+
+    /**
      * Permet aux usagers de prolonger un emprunt.
      */
     @PostMapping(value = "/prolongation/{pretId}/{utilisateurId}")
@@ -231,5 +338,15 @@ public class ApplicationController {
 
         compteService.saveUser(utilisateur);
         return "confirmation";
+    }
+
+    /**
+     * Supprime un prêt.
+     */
+    @GetMapping(value = "/delete/{id}/{utilisateurId}")
+    public String delete(@PathVariable("id") long id, @PathVariable("utilisateurId") long utilisateurId){
+        webProxy.delete(id);
+        log.info("Le prêt avec l'id " + id + " a été supprimé");
+        return "redirect:/usager/reservationsUtilisateur/{utilisateurId}";
     }
 }

@@ -32,15 +32,15 @@ public class ApplicationController {
 
     @GetMapping("/accueil")
     public String accueil(Model model, Principal principal,
-                          @RequestParam(name="titre", defaultValue = "") String titre,
-                          @RequestParam(name="auteur", defaultValue = "") String auteur,
-                          @RequestParam(name="categorie", defaultValue = "") String categorie) {
+                          @RequestParam(name = "titre", defaultValue = "") String titre,
+                          @RequestParam(name = "auteur", defaultValue = "") String auteur,
+                          @RequestParam(name = "categorie", defaultValue = "") String categorie) {
 
 
         List<Livre> livres = webProxy.chercherLivreParCriteres(titre, auteur, categorie);
 
         if (principal != null) {
-            Utilisateur utilisateur = webProxy.getUtilisateurWithEmail(principal.getName());
+            Utilisateur utilisateur = webProxy.getUtilisateurWithPseudo(principal.getName());
             model.addAttribute("utilisateur", utilisateur);
         } else {
             Utilisateur utilisateur = new Utilisateur();
@@ -67,12 +67,12 @@ public class ApplicationController {
         String formatDate = "dd/MM/yyyy";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatDate);
 
-        if (principal == null){
+        if (principal == null) {
             Utilisateur utilisateur = new Utilisateur();
             utilisateur.setId(Long.valueOf(0));
             model.addAttribute("utilisateur", utilisateur);
         } else {
-            Utilisateur utilisateur = webProxy.getUtilisateurWithEmail(principal.getName());
+            Utilisateur utilisateur = webProxy.getUtilisateurWithPseudo(principal.getName());
             model.addAttribute("utilisateur", utilisateur);
         }
 
@@ -142,8 +142,8 @@ public class ApplicationController {
         model.addAttribute("utilisateur", new Utilisateur());
         model.addAttribute("localDate", dateTime);
 
-        if(principal != null) {
-            Utilisateur utilisateur = webProxy.getUtilisateurWithEmail(principal.getName());
+        if (principal != null) {
+            Utilisateur utilisateur = webProxy.getUtilisateurWithPseudo(principal.getName());
             model.addAttribute("u", utilisateur);
         } else {
             Utilisateur utilisateur = new Utilisateur();
@@ -158,9 +158,9 @@ public class ApplicationController {
      * Méthode qui permet d'enregistrer l'inscription ou
      * de renvoyer vers le formulaire d'inscription en cas d'erreur.
      */
-    @RequestMapping(value="/enregistrer", method=RequestMethod.POST)
+    @RequestMapping(value = "/enregistrer", method = RequestMethod.POST)
     public String enregistrer(Model model, @Valid Utilisateur utilisateur, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             log.warn("Erreur lors de l'inscription " + bindingResult.getFieldError());
             return "redirect:/inscription";
         }

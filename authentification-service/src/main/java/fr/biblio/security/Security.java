@@ -26,8 +26,8 @@ public class Security extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
         auth.jdbcAuthentication().dataSource(dataSource)
-                .usersByUsernameQuery("select email as principal, password as credentials, actif from utilisateur where email=?")
-                .authoritiesByUsernameQuery("select email as principal, statut as role from utilisateur where email=?")
+                .usersByUsernameQuery("select pseudo as principal, password as credentials, actif from utilisateur where pseudo=?")
+                .authoritiesByUsernameQuery("select pseudo as principal, statut as role from utilisateur where pseudo=?")
                 .rolePrefix("ROLE_")
                 .passwordEncoder(getBC());
     }

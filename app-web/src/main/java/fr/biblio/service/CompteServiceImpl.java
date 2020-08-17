@@ -22,7 +22,7 @@ public class CompteServiceImpl implements CompteService {
     }
 
     @Override
-    public Utilisateur findByEmail(String email) {
-        return webProxy.getUtilisateurWithEmail(email);
+    public Utilisateur findByPseudo(String pseudo) {
+        return webProxy.getUtilisateurWithPseudo(pseudo);
     }
 }

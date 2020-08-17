@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="36fb7a2c-4bb5-496c-9202-749ae391c99c" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/app-web/src/main/java/fr/biblio/beans/Utilisateur.java" beforeDir="false" afterPath="$PROJECT_DIR$/app-web/src/main/java/fr/biblio/beans/Utilisateur.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-web/src/main/java/fr/biblio/controller/ApplicationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/app-web/src/main/java/fr/biblio/controller/ApplicationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-web/src/main/java/fr/biblio/proxies/WebProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/app-web/src/main/java/fr/biblio/proxies/WebProxy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-web/src/main/java/fr/biblio/service/CompteService.java" beforeDir="false" afterPath="$PROJECT_DIR$/app-web/src/main/java/fr/biblio/service/CompteService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-web/src/main/java/fr/biblio/service/CompteServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/app-web/src/main/java/fr/biblio/service/CompteServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-web/src/main/java/fr/biblio/service/UserDetailsServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/app-web/src/main/java/fr/biblio/service/UserDetailsServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-web/src/main/resources/templates/pretUtilisateur.html" beforeDir="false" afterPath="$PROJECT_DIR$/app-web/src/main/resources/templates/pretUtilisateur.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentification-service/src/main/java/fr/biblio/controller/UtilisateurController.java" beforeDir="false" afterPath="$PROJECT_DIR$/authentification-service/src/main/java/fr/biblio/controller/UtilisateurController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentification-service/src/main/java/fr/biblio/dao/UtilisateurRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/authentification-service/src/main/java/fr/biblio/dao/UtilisateurRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentification-service/src/main/java/fr/biblio/entities/Utilisateur.java" beforeDir="false" afterPath="$PROJECT_DIR$/authentification-service/src/main/java/fr/biblio/entities/Utilisateur.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/authentification-service/src/main/java/fr/biblio/security/Security.java" beforeDir="false" afterPath="$PROJECT_DIR$/authentification-service/src/main/java/fr/biblio/security/Security.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1foc6idpUhpachstY5Ign2vRM1a" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="RequestMappingsPanelOrder0" value="0" />
+    <property name="RequestMappingsPanelOrder1" value="1" />
+    <property name="RequestMappingsPanelWidth0" value="75" />
+    <property name="RequestMappingsPanelWidth1" value="75" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15429688" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="spring" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app-web/src/main/resources/templates" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Spring Boot.PretServiceApplication">
+    <configuration name="AppBatchApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="app-batch" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="fr.biblio.AppBatchApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AppWebApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="app-web" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="fr.biblio.AppWebApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AuthentificationServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="authentification-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="fr.biblio.AuthentificationServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ConfigServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="config-server" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="fr.biblio.ConfigServerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EurekaServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="eureka-server" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="fr.biblio.EurekaServerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LivreServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="livre-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="fr.biblio.LivreServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PretServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="pret-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="fr.biblio.PretServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SpringAdminApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="spring-admin" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="fr.biblio.SpringAdminApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ZuulServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="zuul-server" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="fr.biblio.ZuulServerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="36fb7a2c-4bb5-496c-9202-749ae391c99c" name="Default Changelist" comment="" />
+      <created>1596887712188</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1596887712188</updated>
+      <workItem from="1596887716392" duration="93255000" />
+      <workItem from="1597664829048" duration="458000" />
+      <workItem from="1597665291060" duration="11399000" />
+    </task>
+    <task id="LOCAL-00001" summary="Ajout de la liste d'attente une fois qu'il n'y a plus d'exemplaire disponible, la liste d'attente ne peut comporter que 2x le nombre d'exemplaire et ajout de la mise à dispo pour la première personne sur la liste d'attente.">
+      <created>1597230929164</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1597230929164</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Ajout de conditions dans la méthode addPret (RG : Il n’est pas possible pour un usager de réserver un ouvrage qu’il a déjà en cours d’emprunt).">
+      <created>1597245921174</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1597245921175</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Ajout du tableau de réservation avec le nombre d'exemplaire disponible, le nombre de prêt en cours, le nombre de réservation, la prochaine date de retour et le bouton pour réserver.">
+      <created>1597360802631</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1597360802631</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Ajout de la liste de réservation pour l'utilisateur, ajout de la page pour les informations d'une réservation et ajout de la possibilité d'annuler sa réservation.">
+      <created>1597431281403</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1597431281403</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Ajout de la liste d'attente une fois qu'il n'y a plus d'exemplaire disponible, la liste d'attente ne peut comporter que 2x le nombre d'exemplaire et ajout de la mise à dispo pour la première personne sur la liste d'attente." />
+    <MESSAGE value="Ajout de conditions dans la méthode addPret (RG : Il n’est pas possible pour un usager de réserver un ouvrage qu’il a déjà en cours d’emprunt)." />
+    <MESSAGE value="Ajout du tableau de réservation avec le nombre d'exemplaire disponible, le nombre de prêt en cours, le nombre de réservation, la prochaine date de retour et le bouton pour réserver." />
+    <MESSAGE value="Ajout de la liste de réservation pour l'utilisateur, ajout de la page pour les informations d'une réservation et ajout de la possibilité d'annuler sa réservation." />
+    <option name="LAST_COMMIT_MESSAGE" value="Ajout de la liste de réservation pour l'utilisateur, ajout de la page pour les informations d'une réservation et ajout de la possibilité d'annuler sa réservation." />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="424" y="202" width="1134" height="676" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1597677473703">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="424" y="202" width="1134" height="676" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1597677473703" />
+    <state width="1878" height="244" key="GridCell.Tab.0.bottom" timestamp="1597678850157">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1398" height="244" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1597486037046" />
+    <state width="1878" height="244" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1597678850157" />
+    <state width="1227" height="186" key="GridCell.Tab.0.bottom/0.23.1440.842@0.23.1440.842" timestamp="1597262739296" />
+    <state width="1878" height="244" key="GridCell.Tab.0.bottom/0.23.1920.1022@0.23.1920.1022" timestamp="1597664823908" />
+    <state width="1878" height="244" key="GridCell.Tab.0.center" timestamp="1597678850156">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1398" height="244" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1597486037045" />
+    <state width="1878" height="244" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1597678850156" />
+    <state width="1227" height="186" key="GridCell.Tab.0.center/0.23.1440.842@0.23.1440.842" timestamp="1597262739295" />
+    <state width="1878" height="244" key="GridCell.Tab.0.center/0.23.1920.1022@0.23.1920.1022" timestamp="1597664823908" />
+    <state width="1878" height="244" key="GridCell.Tab.0.left" timestamp="1597678850155">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1398" height="244" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1597486037044" />
+    <state width="1878" height="244" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1597678850155" />
+    <state width="1227" height="186" key="GridCell.Tab.0.left/0.23.1440.842@0.23.1440.842" timestamp="1597262739295" />
+    <state width="1878" height="244" key="GridCell.Tab.0.left/0.23.1920.1022@0.23.1920.1022" timestamp="1597664823908" />
+    <state width="1878" height="244" key="GridCell.Tab.0.right" timestamp="1597678850156">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1398" height="244" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1597486037045" />
+    <state width="1878" height="244" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1597678850156" />
+    <state width="1227" height="186" key="GridCell.Tab.0.right/0.23.1440.842@0.23.1440.842" timestamp="1597262739295" />
+    <state width="1878" height="244" key="GridCell.Tab.0.right/0.23.1920.1022@0.23.1920.1022" timestamp="1597664823908" />
+    <state width="1878" height="244" key="GridCell.Tab.1.bottom" timestamp="1597678850159">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1398" height="244" key="GridCell.Tab.1.bottom/0.0.1440.900@0.0.1440.900" timestamp="1597486037048" />
+    <state width="1878" height="244" key="GridCell.Tab.1.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1597678850159" />
+    <state width="1227" height="186" key="GridCell.Tab.1.bottom/0.23.1440.842@0.23.1440.842" timestamp="1597262739297" />
+    <state width="1878" height="244" key="GridCell.Tab.1.bottom/0.23.1920.1022@0.23.1920.1022" timestamp="1597664823909" />
+    <state width="1878" height="244" key="GridCell.Tab.1.center" timestamp="1597678850158">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1398" height="244" key="GridCell.Tab.1.center/0.0.1440.900@0.0.1440.900" timestamp="1597486037047" />
+    <state width="1878" height="244" key="GridCell.Tab.1.center/0.0.1920.1080@0.0.1920.1080" timestamp="1597678850158" />
+    <state width="1227" height="186" key="GridCell.Tab.1.center/0.23.1440.842@0.23.1440.842" timestamp="1597262739296" />
+    <state width="1878" height="244" key="GridCell.Tab.1.center/0.23.1920.1022@0.23.1920.1022" timestamp="1597664823909" />
+    <state width="1878" height="244" key="GridCell.Tab.1.left" timestamp="1597678850157">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1398" height="244" key="GridCell.Tab.1.left/0.0.1440.900@0.0.1440.900" timestamp="1597486037046" />
+    <state width="1878" height="244" key="GridCell.Tab.1.left/0.0.1920.1080@0.0.1920.1080" timestamp="1597678850157" />
+    <state width="1227" height="186" key="GridCell.Tab.1.left/0.23.1440.842@0.23.1440.842" timestamp="1597262739296" />
+    <state width="1878" height="244" key="GridCell.Tab.1.left/0.23.1920.1022@0.23.1920.1022" timestamp="1597664823908" />
+    <state width="1878" height="244" key="GridCell.Tab.1.right" timestamp="1597678850158">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1398" height="244" key="GridCell.Tab.1.right/0.0.1440.900@0.0.1440.900" timestamp="1597486037047" />
+    <state width="1878" height="244" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1597678850158" />
+    <state width="1227" height="186" key="GridCell.Tab.1.right/0.23.1440.842@0.23.1440.842" timestamp="1597262739297" />
+    <state width="1878" height="244" key="GridCell.Tab.1.right/0.23.1920.1022@0.23.1920.1022" timestamp="1597664823909" />
+    <state x="277" y="37" key="SettingsEditor" timestamp="1597667165395">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="208" y="31" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1597169749602" />
+    <state x="277" y="37" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1597667165395" />
+    <state x="277" y="58" key="SettingsEditor/0.23.1920.1022@0.23.1920.1022" timestamp="1597665578806" />
+    <state x="368" y="196" width="540" height="524" key="StructurePopup" timestamp="1597247442947">
+      <screen x="0" y="23" width="1440" height="842" />
+    </state>
+    <state x="368" y="196" width="540" height="524" key="StructurePopup/0.23.1440.842@0.23.1440.842" timestamp="1597247442947" />
+    <state x="317" y="192" key="Vcs.Push.Dialog.v2" timestamp="1597431283074">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="317" y="192" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1597431283074" />
+    <state x="238" y="173" key="Vcs.Push.Dialog.v2/0.23.1440.842@0.23.1440.842" timestamp="1597245922962" />
+    <state x="653" y="286" key="git4idea.branch.GitSmartOperationDialog" timestamp="1597664941797">
+      <screen x="0" y="23" width="1920" height="1022" />
+    </state>
+    <state x="653" y="286" key="git4idea.branch.GitSmartOperationDialog/0.23.1920.1022@0.23.1920.1022" timestamp="1597664941797" />
+  </component>
+</project>

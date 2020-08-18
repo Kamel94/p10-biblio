@@ -20,12 +20,12 @@
     <div class="card mt-3">
         <div class="card-header">Mes réservations en cours</div>
         <div class="card-body">
-            <div th:each="pret : ${pretEnAttente}">
+            <div th:each="reservation : ${reservationList}">
                 <table class="table text-info mt-3">
                     <tbody>
                     <tr class="text-center bg-info">
-                        <td><a th:href="@{/usager/reservationsUtilisateur/information/{utilisateurId}/{exemplaireId}(utilisateurId=${utilisateur.id}, exemplaireId=${pret.exemplaireId})}"
-                               class="text-light text-center">[[${pret.titreLivre}]] </a> &nbsp; &nbsp; &nbsp; </td>
+                        <td><a th:href="@{/usager/reservationsUtilisateur/information/{utilisateurId}/{exemplaireId}(utilisateurId=${utilisateur.id}, exemplaireId=${reservation.exemplaireId})}"
+                               class="text-light text-center">[[${reservation.titreLivre}]] </a> &nbsp; &nbsp; &nbsp; </td>
                     </tr>
                     </tbody>
                 </table>

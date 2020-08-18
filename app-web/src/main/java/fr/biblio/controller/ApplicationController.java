@@ -67,15 +67,13 @@ public class ApplicationController {
         ExemplaireLivre exemplaire = webProxy.getExemplaireWithLivreId(id);
         List<Pret> prets = webProxy.getPretsWithStatutPretAndExemplaireId(exemplaire.getId());
         List<Pret> pretsOrderByDate = webProxy.getPretsOrderByDateRetourAsc(exemplaire.getId());
-        List<Pret> statutAttente = webProxy.getPretsWithStatutAndExemplaireId("EN ATTENTE", exemplaire.getId());
+        List<Reservation> reservationList = webProxy.getReservationList();
 
         String formatDate = "dd/MM/yyyy";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatDate);
         String date = simpleDateFormat.format(livre.getEdition());
         livre.setEditionString(date);
         int nombreExemplaire = (exemplaire.getNombreExemplaire() + prets.size()) * 2;
-        System.out.println(nombreExemplaire);
-        System.out.println(exemplaire.getNombreExemplaire());
 
         if (principal == null) {
             Utilisateur utilisateur = new Utilisateur();
@@ -83,7 +81,6 @@ public class ApplicationController {
             model.addAttribute("utilisateur", utilisateur);
         } else {
             Utilisateur utilisateur = webProxy.getUtilisateurWithPseudo(principal.getName());
-
             Pret pret = webProxy.findByUtilisateurIdAndExemplaireIdAndStatutNotLike(utilisateur.getId(), exemplaire.getId(), "RENDU");
 
             if (pret == null) {
@@ -96,19 +93,16 @@ public class ApplicationController {
             model.addAttribute("utilisateur", utilisateur);
         }
 
-        if (statutAttente.size() != 0) {
-            int sizeListAttente = statutAttente.size();
-            model.addAttribute("statutAttente", statutAttente);
-            model.addAttribute("sizeListAttente", sizeListAttente);
-            System.out.println(statutAttente.size() + " 1");
+        if (reservationList.size() != 0) {
+            int sizeListreservation = reservationList.size();
+            model.addAttribute("reservationList", reservationList);
+            model.addAttribute("sizeListreservation", sizeListreservation);
         } else {
-            Pret pret1 = new Pret(Long.valueOf(0), new Date(), new Date(), null, 0, Long.valueOf(0), Long.valueOf(0));
-            statutAttente.add(pret1);
-            int sizeListAttente = statutAttente.size() - 1;
-            model.addAttribute("statutAttente", statutAttente);
-            model.addAttribute("sizeListAttente", sizeListAttente);
-            System.out.println(statutAttente.size() + " 0");
-            System.out.println(sizeListAttente + " 0");
+            Reservation reservation = new Reservation(Long.valueOf(0), new Date(), new Date(), Long.valueOf(0), Long.valueOf(0), null, false);
+            reservationList.add(reservation);
+            int sizeListreservation = reservationList.size() - 1;
+            model.addAttribute("reservationList", reservationList);
+            model.addAttribute("sizeListreservation", sizeListreservation);
         }
 
         if (pretsOrderByDate.size() != 0) {
@@ -176,31 +170,28 @@ public class ApplicationController {
     public String reservationUtilisateur(Model model,
                                          @PathVariable("utilisateurId") long utilisateurId) {
 
-        List<Pret> pretEnAttente = webProxy.getPretsWithUtilisateurIdAndStatut(utilisateurId, "EN ATTENTE");
-
+        List<Reservation> reservationList = webProxy.getReservationListByUtilisateurId(utilisateurId);
         Utilisateur utilisateur = webProxy.getUtilisateur(utilisateurId);
 
         String formatDate = "dd/MM/yyyy";
-
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatDate);
 
         try {
-            for (Pret pret : pretEnAttente) {
-                List<Pret> pretsOrderByDate = webProxy.getPretsOrderByDateRetourAsc(pret.getExemplaireId());
-                List<Pret> listeAttente = webProxy.getPretsWithStatutAndExemplaireId("EN ATTENTE", pret.getExemplaireId());
-                ExemplaireLivre exemplaireLivre = webProxy.getExemplaire(pret.getExemplaireId());
+            for (Reservation reservation : reservationList) {
+                List<Pret> pretsOrderByDate = webProxy.getPretsOrderByDateRetourAsc(reservation.getExemplaireId());
+                ExemplaireLivre exemplaireLivre = webProxy.getExemplaire(reservation.getExemplaireId());
                 Livre livre = webProxy.getLivre(exemplaireLivre.getLivreId());
 
-                if (listeAttente.size() != 0) {
-                    int sizeListAttente = listeAttente.size();
-                    model.addAttribute("statutAttente", listeAttente);
-                    model.addAttribute("sizeListAttente", sizeListAttente);
+                if (reservationList.size() != 0) {
+                    int sizeListreservation = reservationList.size();
+                    model.addAttribute("reservationList", reservationList);
+                    model.addAttribute("sizeListreservation", sizeListreservation);
                 } else {
-                    Pret pret1 = new Pret(Long.valueOf(0), new Date(), new Date(), null, 0, Long.valueOf(0), Long.valueOf(0));
-                    listeAttente.add(pret1);
-                    int sizeListAttente = listeAttente.size() - 1;
-                    model.addAttribute("statutAttente", listeAttente);
-                    model.addAttribute("sizeListAttente", sizeListAttente);
+                    Reservation resa = new Reservation(Long.valueOf(0), new Date(), new Date(), Long.valueOf(0), Long.valueOf(0), null, false);
+                    reservationList.add(resa);
+                    int sizeListreservation = reservationList.size() - 1;
+                    model.addAttribute("reservationList", reservationList);
+                    model.addAttribute("sizeListreservation", sizeListreservation);
                 }
 
                 if (pretsOrderByDate.size() != 0) {
@@ -217,20 +208,13 @@ public class ApplicationController {
                     model.addAttribute("pretsOrderByDate", pretsOrderByDate);
                     model.addAttribute("sizeList", sizeList);
                 }
-
-                pret.setTitreLivre(livre.getTitre());
-                pret.setNumeroSerieExemplaire(exemplaireLivre.getNumeroSerie());
-                String date = simpleDateFormat.format(pret.getDateRetour());
-                pret.setDateRetourString(date);
-
-                model.addAttribute("date", date);
+                reservation.setTitreLivre(livre.getTitre());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         model.addAttribute("today", new Date());
-        model.addAttribute("pretEnAttente", pretEnAttente);
         model.addAttribute("utilisateur", utilisateur);
 
         return "reservationsUtilisateur";
@@ -246,17 +230,17 @@ public class ApplicationController {
         String formatDate = "dd/MM/yyyy";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatDate);
         List<Pret> pretsOrderByDate = webProxy.getPretsOrderByDateRetourAsc(exemplaireId);
-        List<Pret> listeAttente = webProxy.getPretsWithStatutAndExemplaireId("EN ATTENTE", exemplaireId);
-        Pret pretUtilisateur = webProxy.getPretWithUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, "EN ATTENTE");
+        List<Reservation> reservationList = webProxy.getReservationListByExemplaireId(exemplaireId);
         ExemplaireLivre exemplaireLivre = webProxy.getExemplaire(exemplaireId);
         Livre livre = webProxy.getLivre(exemplaireLivre.getLivreId());
+        Reservation reservation = webProxy.getReservationByUtilisateurIdAndExemplaireId(utilisateurId, exemplaireId);
 
-        if (listeAttente.size() != 0) {
-            model.addAttribute("listeAttente", listeAttente);
+        if (reservationList.size() != 0) {
+            model.addAttribute("reservationList", reservationList);
         } else {
-            Pret pret1 = new Pret(Long.valueOf(0), new Date(), new Date(), null, 0, Long.valueOf(0), Long.valueOf(0));
-            listeAttente.add(pret1);
-            model.addAttribute("listeAttente", listeAttente);
+            Reservation resa = new Reservation(Long.valueOf(0), new Date(), new Date(), Long.valueOf(0), Long.valueOf(0), null, false);
+            reservationList.add(resa);
+            model.addAttribute("reservationList", reservationList);
         }
 
         if (pretsOrderByDate.size() != 0) {
@@ -270,7 +254,7 @@ public class ApplicationController {
             model.addAttribute("pretsOrderByDate", pretsOrderByDate);
         }
         model.addAttribute("livre", livre);
-        model.addAttribute("pretUtilisateur", pretUtilisateur);
+        model.addAttribute("reservation", reservation);
 
         return "infosReservation";
     }
@@ -290,12 +274,12 @@ public class ApplicationController {
     /**
      * Permet aux usagers de demander un emprunt.
      */
-    @GetMapping(value = "/usager/ajoutPret/{utilisateurId}/{exemplaireId}/{livreId}")
-    public String addPret(@PathVariable("exemplaireId") long exemplaireId,
+    @GetMapping(value = "/usager/ajoutReservation/{utilisateurId}/{exemplaireId}/{livreId}")
+    public String addBooking(@PathVariable("exemplaireId") long exemplaireId,
                           @PathVariable("utilisateurId") long utilisateurId,
                           @PathVariable("livreId") long livreId) {
 
-        webProxy.addPret(utilisateurId, exemplaireId);
+        webProxy.addBooking(utilisateurId, exemplaireId);
 
         return "redirect:/detailsLivre/{livreId}";
     }

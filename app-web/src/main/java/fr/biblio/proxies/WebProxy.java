@@ -80,12 +80,29 @@ public interface WebProxy {
 
     @PostMapping(value = "/pret-service/ajoutPret/{utilisateurId}/{exemplaireId}")
     Pret addPret(@PathVariable("utilisateurId") long utilisateurId,
-                        @PathVariable("exemplaireId") long exemplaireId);
+                 @PathVariable("exemplaireId") long exemplaireId);
 
     @PostMapping(value = "/pret-service/prolongation/{pretId}")
     Pret prolongerPret(@PathVariable("pretId") long pretId);
 
     @PostMapping(value = "/pret-service/delete/{id}")
     Pret delete(@PathVariable("id") long id);
+
+    @GetMapping(value = "/pret-service/reservations")
+    List<Reservation> getReservationList();
+
+    @GetMapping(value = "/pret-service/reservationsByUtilisateurId/{utilisateurId}")
+    List<Reservation> getReservationListByUtilisateurId(@PathVariable("utilisateurId") long utilisateurId);
+
+    @GetMapping(value = "/pret-service/reservationsByExemplaireId/{exemplaireId}")
+    List<Reservation> getReservationListByExemplaireId(@PathVariable("exemplaireId") long exemplaireId);
+
+    @GetMapping(value = "/pret-service/reservationByUtilisateurIdAndExemplaireId/{utilisateurId}/{exemplaireId}")
+    Reservation getReservationByUtilisateurIdAndExemplaireId(@PathVariable("utilisateurId") long utilisateurId,
+                                                             @PathVariable("exemplaireId") long exemplaireId);
+
+    @PostMapping(value = "/pret-service/ajoutReservation/{utilisateurId}/{exemplaireId}")
+    Reservation addBooking(@PathVariable("utilisateurId") long utilisateurId,
+                           @PathVariable("exemplaireId") long exemplaireId);
 
 }

@@ -77,31 +77,31 @@
                     <span th:text="${pretsOrderByDate.size()}"></span>
                 </td>
                 <td class="mt-3"
-                    th:if="${sizeListAttente == 0}">
-                    <span th:text="${sizeListAttente}"></span>
+                    th:if="${sizeListreservation == 0}">
+                    <span th:text="${sizeListreservation}"></span>
                 </td>
                 <td class="mt-3"
-                    th:if="${sizeListAttente != 0}">
-                    <span th:text="${statutAttente.size()}"></span>
+                    th:if="${sizeListreservation != 0}">
+                    <span th:text="${reservationList.size()}"></span>
                 </td>
                 <td class="mt-3">
                     <span th:text="${pretsOrderByDate.get(0).dateRetourString}"></span>
                 </td>
                 <td class="mt-3">
                     <a class="btn btn-info btn-titre rond-lege btn-sm"
-                       th:if="${utilisateur.id} != 0 and ${nombreExemplaire} > ${statutAttente.size()} and ${p.utilisateurId} != ${utilisateur.id}"
-                       th:href="@{/usager/ajoutPret/{utilisateurId}/{exemplaireId}/{livreId}(utilisateurId=${utilisateur.id}, exemplaireId=${exemplaire.id}, livreId=${livre.id})}">
+                       th:if="${utilisateur.id} != 0 and ${nombreExemplaire} > ${reservationList.size()} and ${p.utilisateurId} != ${utilisateur.id}"
+                       th:href="@{/usager/ajoutReservation/{utilisateurId}/{exemplaireId}/{livreId}(utilisateurId=${utilisateur.id}, exemplaireId=${exemplaire.id}, livreId=${livre.id})}">
                         Réserver</a>
                     <a class="disabled btn btn-danger btn-titre rond-lege btn-sm"
-                       th:if="${utilisateur.id} != 0 and ${nombreExemplaire} > ${statutAttente.size()} and ${p.utilisateurId} == ${utilisateur.id}">
+                       th:if="${utilisateur.id} != 0 and ${nombreExemplaire} > ${reservationList.size()} and ${p.utilisateurId} == ${utilisateur.id}">
                         Déjà réservé
                     </a>
                     <a class="disabled btn btn-danger btn-titre rond-lege btn-sm"
-                       th:if="${utilisateur.id} != 0 and ${nombreExemplaire} <= ${statutAttente.size()} and ${p.utilisateurId} == ${utilisateur.id}">
+                       th:if="${utilisateur.id} != 0 and ${nombreExemplaire} <= ${reservationList.size()} and ${p.utilisateurId} == ${utilisateur.id}">
                         Déjà réservé
                     </a>
                     <a class="disabled btn btn-danger btn-titre rond-lege btn-sm"
-                       th:if="${utilisateur.id} != 0 and ${nombreExemplaire} <= ${statutAttente.size()} and ${p.utilisateurId} == 0">
+                       th:if="${utilisateur.id} != 0 and ${nombreExemplaire} <= ${reservationList.size()} and ${p.utilisateurId} == 0">
                         Non disponible
                     </a>
                     <a th:if="${utilisateur.id} == 0"

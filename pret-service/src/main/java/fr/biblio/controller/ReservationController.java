@@ -10,13 +10,9 @@ import fr.biblio.proxies.PretProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 @RestController
@@ -55,6 +51,23 @@ public class ReservationController {
     @GetMapping(value = "/reservationsByExemplaireId/{exemplaireId}")
     public List<Reservation> getReservationListByExemplaireId(@PathVariable("exemplaireId") long exemplaireId) {
         return reservationRepository.findAllByExemplaireId(exemplaireId);
+    }
+
+    /**
+     * Affiche la liste des réservations de par le statut.
+     */
+    @GetMapping(value = "/reservationsByStatut/{statut}")
+    public List<Reservation> getReservationListByStatut(@PathVariable("statut") String statut) {
+        return reservationRepository.findAllByStatut(statut);
+    }
+
+    /**
+     * Affiche la liste des réservations de par le statut et la notification.
+     */
+    @GetMapping(value = "/reservationsByStatutAndNotification/{statut}/{notification}")
+    public List<Reservation> getReservationListByStatutAndNotification(@PathVariable("statut") String statut,
+                                                                       @PathVariable("notification") boolean notification) {
+        return reservationRepository.findAllByStatutAndNotification(statut, notification);
     }
 
     /**
@@ -115,6 +128,14 @@ public class ReservationController {
             log.info("Vous avez déjà une réservation en cours sur ce livre.");
             return null;
         }
+        return reservationRepository.save(reservation);
+    }
+
+    @PutMapping(value = "/updateReservation/{id}")
+    public Reservation updateReservation(@PathVariable("id") long id) {
+        Reservation reservation = reservationRepository.getOne(id);
+        reservation.setNotification(true);
+        reservation.setNotificationDate(new Date());
         return reservationRepository.save(reservation);
     }
 }

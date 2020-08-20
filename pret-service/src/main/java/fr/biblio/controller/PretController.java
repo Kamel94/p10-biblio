@@ -163,14 +163,14 @@ public class PretController {
     @PostMapping(value = "/livreRendu/{pretId}")
     public Pret rendreLivre(@PathVariable("pretId") long pretId) {
 
-        List<Pret> prets = pretRepository.findPretByStatut(Constantes.EN_ATTENTE);
         Pret pret = pretRepository.findById(pretId).get();
         ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(pret.getExemplaireId());
+        List<Reservation> reservationList = reservationRepository.findAllByStatutAndExemplaireId(Constantes.EN_ATTENTE, pret.getExemplaireId());
         int i = 0;
 
-        if (pret.getStatut().equals(Constantes.PRET) || pret.getStatut().equals(Constantes.MIS_A_DISPO)) {
+        if (pret.getStatut().equals(Constantes.PRET)) {
 
-            if (prets.isEmpty()) {
+            if (reservationList.isEmpty()) {
                 exemplaireLivre.setNombreExemplaire(exemplaireLivre.getNombreExemplaire() + 1);
             }
 
@@ -182,19 +182,13 @@ public class PretController {
             pret.setStatut(Constantes.RENDU);
             pret.setDateRetour(new Date());
 
-                if (!prets.isEmpty() && pret.getExemplaireId() == prets.get(i).getExemplaireId()) {
+                if (!reservationList.isEmpty() && pret.getExemplaireId() == reservationList.get(i).getExemplaireId()) {
                     try {
-                        GregorianCalendar date = new GregorianCalendar();
-
-                        date.setTime(prets.get(i).getDatePret());
-                        date.add(GregorianCalendar.DAY_OF_YEAR, + 28);
-
-                        prets.get(i).setStatut(Constantes.MIS_A_DISPO);
-                        prets.get(i).setDateRetour(date.getTime());
+                        reservationList.get(i).setStatut(Constantes.MIS_A_DISPO);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    return pretRepository.save(prets.get(i));
+                    reservationRepository.save(reservationList.get(i));
                 }
 
         } else {
@@ -267,7 +261,7 @@ public class PretController {
                 pret.setDateRetour(date.getTime());
                 pret.setProlongation(0);
                 pret.setExemplaireId(exemplaireLivre.getId());
-                pret.setStatut("PRET");
+                pret.setStatut(Constantes.PRET);
 
             } catch (Exception e) {
                 e.printStackTrace();

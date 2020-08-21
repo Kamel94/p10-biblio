@@ -10,6 +10,7 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     List<Reservation> findAllByStatutAndExemplaireId(String statut, long exemplaireId);
+    List<Reservation> findAllByStatutNotLikeAndExemplaireId(String statut, long exemplaireId);
     List<Reservation> findAllByStatutAndNotification(String statut, boolean notification);
     List<Reservation> findAllByUtilisateurId(long utilisateurId);
     List<Reservation> findAllByExemplaireId(long exemplaireId);

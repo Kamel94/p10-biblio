@@ -71,6 +71,15 @@ public class ReservationController {
     }
 
     /**
+     * Affiche la liste des réservations de par le statut et l'ID de l'exemplaire.
+     */
+    @GetMapping(value = "/reservationsByStatutNotLikeAndExemplaireId/{statut}/{exemplaireId}")
+    public List<Reservation> getReservationListByStatutNotLikeAndExemplaireId(@PathVariable("statut") String statut,
+                                                                       @PathVariable("exemplaireId") long exemplaireId) {
+        return reservationRepository.findAllByStatutNotLikeAndExemplaireId(statut, exemplaireId);
+    }
+
+    /**
      * Affiche une réservation de par l'ID de l'utilisateur et l'ID de l'exemplaire.
      */
     @GetMapping(value = "/reservationByUtilisateurIdAndExemplaireId/{utilisateurId}/{exemplaireId}")

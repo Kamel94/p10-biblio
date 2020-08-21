@@ -28,6 +28,9 @@ public class PretController {
     private ReservationRepository reservationRepository;
 
     @Autowired
+    private ReservationController reservationController;
+
+    @Autowired
     private PretProxy pretProxy;
 
     Logger log = LoggerFactory.getLogger(PretController.class);
@@ -256,7 +259,27 @@ public class PretController {
 
                 pret.setDatePret(new Date());
                 date.setTime(pret.getDatePret());
-                date.add(GregorianCalendar.DAY_OF_YEAR, +28);
+                date.add(GregorianCalendar.DAY_OF_YEAR, + 28);
+                pret.setUtilisateurId(utilisateurId);
+                pret.setDateRetour(date.getTime());
+                pret.setProlongation(0);
+                pret.setExemplaireId(exemplaireLivre.getId());
+                pret.setStatut(Constantes.PRET);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return pretRepository.save(pret);
+
+        } else if (pretWithStatutPret == null && reservationByUtilisateur.getStatut().equals(Constantes.MIS_A_DISPO)) {
+            log.info("Vous pouvez récupérer votre réservation.");
+            reservationController.cancelReservation(reservationByUtilisateur.getId());
+            try {
+                GregorianCalendar date = new GregorianCalendar();
+
+                pret.setDatePret(new Date());
+                date.setTime(pret.getDatePret());
+                date.add(GregorianCalendar.DAY_OF_YEAR, + 28);
                 pret.setUtilisateurId(utilisateurId);
                 pret.setDateRetour(date.getTime());
                 pret.setProlongation(0);
@@ -270,6 +293,7 @@ public class PretController {
 
         } else if (pretWithStatutPret != null) {
             log.info("Vous avez déjà un emprunt en cours sur ce livre.");
+
         } else if (reservationByUtilisateur != null) {
             log.info("Vous avez déjà une réservation en cours sur ce livre.");
         }

@@ -67,7 +67,7 @@ public class ApplicationController {
         ExemplaireLivre exemplaire = webProxy.getExemplaireWithLivreId(id);
         List<Pret> prets = webProxy.getPretsWithStatutPretAndExemplaireId(exemplaire.getId());
         List<Pret> pretsOrderByDate = webProxy.getPretsOrderByDateRetourAsc(exemplaire.getId());
-        List<Reservation> reservationList = webProxy.getReservationList();
+        List<Reservation> reservationList = webProxy.getReservationListByStatutNotLikeAndExemplaireId("ANNULEE", exemplaire.getId());
 
         String formatDate = "dd/MM/yyyy";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatDate);
@@ -81,7 +81,8 @@ public class ApplicationController {
             model.addAttribute("utilisateur", utilisateur);
         } else {
             Utilisateur utilisateur = webProxy.getUtilisateurWithPseudo(principal.getName());
-            Pret pret = webProxy.findByUtilisateurIdAndExemplaireIdAndStatutNotLike(utilisateur.getId(), exemplaire.getId(), "RENDU");
+            Pret pret = webProxy.getPretWithUtilisateurIdAndExemplaireIdAndStatut(utilisateur.getId(), exemplaire.getId(), "PRET");
+            Reservation reservation = webProxy.getReservationByUtilisateurIdAndExemplaireId(utilisateur.getId(), exemplaire.getId());
 
             if (pret == null) {
                 Pret newPret = new Pret();
@@ -89,6 +90,14 @@ public class ApplicationController {
                 model.addAttribute("p", newPret);
             } else {
                 model.addAttribute("p", pret);
+            }
+
+            if (reservation == null) {
+                Reservation newReservation = new Reservation();
+                newReservation.setUtilisateurId(Long.valueOf(0));
+                model.addAttribute("reservation", newReservation);
+            } else {
+                model.addAttribute("reservation", reservation);
             }
             model.addAttribute("utilisateur", utilisateur);
         }

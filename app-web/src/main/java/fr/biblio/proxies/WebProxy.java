@@ -97,6 +97,10 @@ public interface WebProxy {
     @GetMapping(value = "/pret-service/reservationsByExemplaireId/{exemplaireId}")
     List<Reservation> getReservationListByExemplaireId(@PathVariable("exemplaireId") long exemplaireId);
 
+    @GetMapping(value = "/pret-service/reservationsByStatutNotLikeAndExemplaireId/{statut}/{exemplaireId}")
+    List<Reservation> getReservationListByStatutNotLikeAndExemplaireId(@PathVariable("statut") String statut,
+                                                                @PathVariable("exemplaireId") long exemplaireId);
+
     @GetMapping(value = "/pret-service/reservationByUtilisateurIdAndExemplaireId/{utilisateurId}/{exemplaireId}")
     Reservation getReservationByUtilisateurIdAndExemplaireId(@PathVariable("utilisateurId") long utilisateurId,
                                                              @PathVariable("exemplaireId") long exemplaireId);

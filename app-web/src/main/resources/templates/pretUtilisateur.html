@@ -19,8 +19,6 @@
 <div class="container">
     <div class="card mt-3">
         <div class="card-header">Mes prêts en cours
-        <a th:href="@{/usager/reservationsUtilisateur/{utilisateurId}(utilisateurId=${utilisateur.id})}"
-           class="float-right">Voir ma liste de réservation</a>
         </div>
         <div class="card-body">
             <div th:each="pret : ${prets}">

@@ -138,4 +138,30 @@ public class ReservationController {
         reservation.setNotificationDate(new Date());
         return reservationRepository.save(reservation);
     }
+
+    @PutMapping(value = "/cancelReservation/{id}")
+    public Reservation cancelReservation(@PathVariable("id") long id) {
+        Reservation reservation = reservationRepository.getOne(id);
+        List<Reservation> reservationList = reservationRepository.findAllByStatutAndExemplaireId(Constantes.EN_ATTENTE, reservation.getExemplaireId());
+        ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(reservation.getExemplaireId());
+        reservation.setStatut(Constantes.ANNULEE);
+
+        if (!reservationList.isEmpty()) {
+            try {
+                reservationList.get(0).setStatut(Constantes.MIS_A_DISPO);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            reservationRepository.save(reservationList.get(0));
+        } else if (reservationList.isEmpty()) {
+            exemplaireLivre.setNombreExemplaire(exemplaireLivre.getNombreExemplaire() + 1);
+        }
+
+        if (exemplaireLivre.getNombreExemplaire() > 0) {
+            exemplaireLivre.setDisponibilite(true);
+        }
+        pretProxy.updateExemplaire(exemplaireLivre);
+
+        return reservationRepository.save(reservation);
+    }
 }

@@ -26,6 +26,9 @@ public interface BatchProxy {
     @GetMapping(value = "/pret-service/dateRetourPassee")
     List<Pret> getPretsFinished();
 
+    @GetMapping(value = "/pret-service/reservations")
+    List<Reservation> getReservationList();
+
     @GetMapping(value = "/pret-service/reservationsByExemplaireId/{exemplaireId}")
     List<Reservation> getReservationListByExemplaireId(@PathVariable("exemplaireId") long exemplaireId);
 
@@ -38,5 +41,8 @@ public interface BatchProxy {
 
     @PutMapping(value = "/pret-service/updateReservation/{id}")
     Reservation updateReservation(@PathVariable("id") long id);
+
+    @PutMapping(value = "/pret-service/cancelReservation/{id}")
+    Reservation cancelReservation(@PathVariable("id") long id);
 
 }

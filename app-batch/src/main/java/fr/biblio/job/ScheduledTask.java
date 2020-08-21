@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 @Component
@@ -97,41 +100,65 @@ public class ScheduledTask {
     public void executeTask2() {
 
         List<Reservation> reservationList = batchProxy.getReservationListByStatutAndNotification(Constantes.MIS_A_DISPO, false);
+        List<Reservation> allReservations = batchProxy.getReservationList();
 
         try {
-            for (Reservation reservation : reservationList) {
-                Utilisateur utilisateur = batchProxy.getUtilisateur(reservation.getUtilisateurId());
+            for (Reservation reservation : allReservations) {
                 ExemplaireLivre exemplaireLivre = batchProxy.getExemplaire(reservation.getExemplaireId());
                 Livre livre = batchProxy.getLivre(exemplaireLivre.getLivreId());
-                Bibliotheque bibliotheque = batchProxy.getBibliotheque(exemplaireLivre.getBibliothequeId());
 
-                String booking = formatDate.patternDate(reservation.getBooking());
-                String civilite = "";
-                String destinataire = utilisateur.getEmail();
-                String objet = "Mis à disposition !";
+                if (reservation.getStatut().equals(Constantes.MIS_A_DISPO) && reservation.isNotification()) {
 
-                batchProxy.updateReservation(reservation.getId());
+                    GregorianCalendar date = new GregorianCalendar();
+                    date.setTime(reservation.getNotificationDate());
+                    date.add(GregorianCalendar.DAY_OF_YEAR, + 2);
+                    Date dateLimit = date.getTime();
+                    Date today = new Date();
 
-                if (utilisateur.getGenreId() == 1) {
-                    civilite = "Mr";
-                } else {
-                    civilite = "Mme";
+                    Long todayLong = today.getTime();
+                    Long dateLimitLong = dateLimit.getTime();
+
+                    System.out.println(todayLong);
+                    System.out.println(dateLimitLong);
+
+                    if (todayLong >= dateLimitLong) {
+                        log.info("La mis à disposition du livre '" + livre.getTitre() + "' est annulée car le délai est passé...");
+                        batchProxy.cancelReservation(reservation.getId());
+                    }
                 }
 
-                String message = "Bonjour " + civilite + " " + utilisateur.getNom() + "," +
-                        "\n\nLe livre " + "''" + livre.getTitre() + "''" +
-                        " de " + livre.getAuteur() +
-                        " que vous avez réservé le " + booking + " est de nouveau disponible." +
-                        "\nMerci de venir le chercher au plus tôt à la bibliothèque " +
-                        "''" + bibliotheque.getNom() + "''" + "." +
-                        "\n" + "Attention ! Vous disposez de 48h pour le récupérer, passé ce délai, il ne vous sera plus réservé." +
-                        "\n\nService de la ville";
+                if (reservation.getStatut().equals(Constantes.MIS_A_DISPO) && !reservation.isNotification()) {
+                    Utilisateur utilisateur = batchProxy.getUtilisateur(reservation.getUtilisateurId());
+                    Bibliotheque bibliotheque = batchProxy.getBibliotheque(exemplaireLivre.getBibliothequeId());
 
-                // envoie du mail
-                log.info("****************************************************************************************");
-                log.info("Email envoyé a: " + destinataire);
-                log.info("****************************************************************************************");
-                emailService.sendSimpleEmail(destinataire, objet, message);
+                    String booking = formatDate.patternDate(reservation.getBooking());
+                    String civilite = "";
+                    String destinataire = utilisateur.getEmail();
+                    String objet = "Mis à disposition !";
+
+                    batchProxy.updateReservation(reservation.getId());
+
+                    if (utilisateur.getGenreId() == 1) {
+                        civilite = "Mr";
+                    } else {
+                        civilite = "Mme";
+                    }
+
+                    String message = "Bonjour " + civilite + " " + utilisateur.getNom() + "," +
+                            "\n\nLe livre " + "''" + livre.getTitre() + "''" +
+                            " de " + livre.getAuteur() +
+                            " que vous avez réservé le " + booking + " est de nouveau disponible." +
+                            "\nMerci de venir le chercher au plus tôt à la bibliothèque " +
+                            "''" + bibliotheque.getNom() + "''" + "." +
+                            "\n" + "Attention ! Vous disposez de 48h pour le récupérer, passé ce délai, il ne vous sera plus réservé." +
+                            "\n\nService de la ville";
+
+                    // envoie du mail
+                    log.info("****************************************************************************************");
+                    log.info("Email envoyé a: " + destinataire);
+                    log.info("****************************************************************************************");
+                    emailService.sendSimpleEmail(destinataire, objet, message);
+                }
             }
 
             if (reservationList.isEmpty()) {

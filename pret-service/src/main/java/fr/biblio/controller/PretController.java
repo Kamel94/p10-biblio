@@ -168,31 +168,30 @@ public class PretController {
 
         Pret pret = pretRepository.findById(pretId).get();
         ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(pret.getExemplaireId());
-        List<Reservation> reservationList = reservationRepository.findAllByStatutAndExemplaireId(Constantes.EN_ATTENTE, pret.getExemplaireId());
-        int i = 0;
 
         if (pret.getStatut().equals(Constantes.PRET)) {
 
-            if (reservationList.isEmpty()) {
+            pretProxy.updateExemplaire(exemplaireLivre);
+            pret.setStatut(Constantes.RENDU);
+            pret.setDateRetour(new Date());
+
+            List<Reservation> reservationList = reservationRepository.findAllByStatutAndExemplaireId(Constantes.EN_ATTENTE, exemplaireLivre.getId());
+
+            if (!reservationList.isEmpty()) {
+                try {
+                    reservationList.get(0).setStatut(Constantes.MIS_A_DISPO);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                reservationRepository.save(reservationList.get(0));
+            } else if (reservationList.isEmpty()) {
                 exemplaireLivre.setNombreExemplaire(exemplaireLivre.getNombreExemplaire() + 1);
             }
 
             if (exemplaireLivre.getNombreExemplaire() > 0) {
                 exemplaireLivre.setDisponibilite(true);
             }
-
             pretProxy.updateExemplaire(exemplaireLivre);
-            pret.setStatut(Constantes.RENDU);
-            pret.setDateRetour(new Date());
-
-                if (!reservationList.isEmpty() && pret.getExemplaireId() == reservationList.get(i).getExemplaireId()) {
-                    try {
-                        reservationList.get(i).setStatut(Constantes.MIS_A_DISPO);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    reservationRepository.save(reservationList.get(i));
-                }
 
         } else {
             log.info("Ce prêt n'est pas en cours...");
@@ -233,20 +232,20 @@ public class PretController {
      */
     @PostMapping(value = "/ajoutPret/{utilisateurId}/{exemplaireId}")
     public Pret addPret(@PathVariable("utilisateurId") long utilisateurId,
-                          @PathVariable("exemplaireId") long exemplaireId) {
+                        @PathVariable("exemplaireId") long exemplaireId) {
 
         Pret pret = new Pret();
         Pret pretWithStatutPret = pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, Constantes.PRET);
         Reservation reservationByUtilisateur = reservationRepository.findByUtilisateurIdAndExemplaireId(utilisateurId, exemplaireId);
         ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(exemplaireId);
 
-        if(!exemplaireLivre.isDisponibilite() && pretWithStatutPret == null &&
+        if (!exemplaireLivre.isDisponibilite() && pretWithStatutPret == null &&
                 reservationByUtilisateur == null) {
             log.info("L'exemplaire '" + exemplaireLivre.getLivre().getTitre() + "' n'est pas disponible..." +
                     "\nMerci de faire une réservation.");
 
         } else if (exemplaireLivre.isDisponibilite() && pretWithStatutPret == null &&
-                 reservationByUtilisateur == null) {
+                reservationByUtilisateur == null) {
             exemplaireLivre.setNombreExemplaire(exemplaireLivre.getNombreExemplaire() - 1);
 
             if (exemplaireLivre.getNombreExemplaire() == 0) {
@@ -273,7 +272,8 @@ public class PretController {
 
         } else if (pretWithStatutPret == null && reservationByUtilisateur.getStatut().equals(Constantes.MIS_A_DISPO)) {
             log.info("Vous pouvez récupérer votre réservation.");
-            reservationController.cancelReservation(reservationByUtilisateur.getId());
+            reservationByUtilisateur.setStatut("RECUPERER");
+            reservationRepository.save(reservationByUtilisateur);
             try {
                 GregorianCalendar date = new GregorianCalendar();
 

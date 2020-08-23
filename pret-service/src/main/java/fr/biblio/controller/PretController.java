@@ -109,13 +109,17 @@ public class PretController {
     public Pret prolongerPret(@PathVariable("pretId") long pretId) {
 
         Pret pret = pretRepository.findById(pretId).get();
+        Date today = new Date();
 
-        if (pret.getProlongation() == 0) {
+        long todayLong = today.getTime();
+        long dateRetourLong = pret.getDateRetour().getTime();
+
+        if (pret.getProlongation() == 0 && todayLong < dateRetourLong) {
             try {
                 GregorianCalendar date = new GregorianCalendar();
 
                 date.setTime(pret.getDateRetour());
-                date.add(GregorianCalendar.DAY_OF_YEAR, +28);
+                date.add(GregorianCalendar.DAY_OF_YEAR, + 28);
 
                 pret.setDateRetour(date.getTime());
                 pret.setProlongation(pret.getProlongation() + 1);
@@ -124,7 +128,11 @@ public class PretController {
                 e.printStackTrace();
             }
             return pretRepository.save(pret);
-        } else {
+
+        } else if (pret.getProlongation() == 0 && todayLong >= dateRetourLong) {
+            log.info("Vous ne pouvez plus prolonger ce prêt, car la date de retour du prêt est dépassée.");
+
+        } else if (pret.getProlongation() >= 1) {
             log.info("Ce prêt a atteint le nombre maximum de prolongation...");
         }
         return null;

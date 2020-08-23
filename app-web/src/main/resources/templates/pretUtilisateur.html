@@ -63,7 +63,7 @@
                                th:href="@{/prolongation/{pretId}/{utilisateurId}(pretId=${pret.id}, utilisateurId=${utilisateur.id})}">
                                 Prolonger</a>
                             <span class="text-danger"
-                                  th:if="${pret.prolongation} == 0 and ${today} > ${pret.dateRetour}">
+                                  th:if="${pret.prolongation} == 0 and ${today} >= ${pret.dateRetour}">
                                 Vous ne pouvez plus prolonger ce prêt, car la date de retour est passée.
                             </span>
                             <span th:if="${pret.prolongation} != 0">

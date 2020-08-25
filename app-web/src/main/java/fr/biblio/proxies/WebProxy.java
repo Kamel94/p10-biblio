@@ -49,13 +49,13 @@ public interface WebProxy {
 
     @GetMapping(value = "/pret-service/prets/{utilisateurId}/{exemplaireId}/{statut}")
     Pret getPretWithUtilisateurIdAndExemplaireIdAndStatut(@PathVariable("utilisateurId") long utilisateurId,
-                                                                 @PathVariable("exemplaireId") long exemplaireId,
-                                                                 @PathVariable("statut") String statut);
+                                                          @PathVariable("exemplaireId") long exemplaireId,
+                                                          @PathVariable("statut") String statut);
 
     @GetMapping(value = "/pret-service/prets/{utilisateurId}/{exemplaireId}/notLike/{statut}")
     Pret findByUtilisateurIdAndExemplaireIdAndStatutNotLike(@PathVariable("utilisateurId") long utilisateurId,
-                                                 @PathVariable("exemplaireId") long exemplaireId,
-                                                 @PathVariable("statut") String statut);
+                                                            @PathVariable("exemplaireId") long exemplaireId,
+                                                            @PathVariable("statut") String statut);
 
     @RequestMapping(value = "/pret-service/prets")
     List<Pret> listeDesPrets();
@@ -99,7 +99,7 @@ public interface WebProxy {
 
     @GetMapping(value = "/pret-service/reservationsByStatutNotLikeAndExemplaireId/{statut}/{exemplaireId}")
     List<Reservation> getReservationListByStatutNotLikeAndExemplaireId(@PathVariable("statut") String statut,
-                                                                @PathVariable("exemplaireId") long exemplaireId);
+                                                                       @PathVariable("exemplaireId") long exemplaireId);
 
     @GetMapping(value = "/pret-service/reservationByUtilisateurIdAndExemplaireId/{utilisateurId}/{exemplaireId}")
     Reservation getReservationByUtilisateurIdAndExemplaireId(@PathVariable("utilisateurId") long utilisateurId,

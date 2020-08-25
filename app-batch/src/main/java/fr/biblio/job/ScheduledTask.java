@@ -93,7 +93,7 @@ public class ScheduledTask {
     @Scheduled(cron = "* * * ? * *", zone = "Europe/Paris")
     public void executeTask2() {
 
-        List<Reservation> reservationList = batchProxy.getReservationListByStatutAndNotification(Constantes.MIS_A_DISPO, false);
+        List<Reservation> reservationList = batchProxy.getReservationListByStatutAndNotificationDate(Constantes.MIS_A_DISPO, null);
         List<Reservation> allReservations = batchProxy.getReservationList();
 
         try {
@@ -101,7 +101,7 @@ public class ScheduledTask {
                 ExemplaireLivre exemplaireLivre = batchProxy.getExemplaire(reservation.getExemplaireId());
                 Livre livre = batchProxy.getLivre(exemplaireLivre.getLivreId());
 
-                if (reservation.getStatut().equals(Constantes.MIS_A_DISPO) && reservation.isNotification()) {
+                if (reservation.getStatut().equals(Constantes.MIS_A_DISPO) && reservation.getNotificationDate() != null) {
 
                     GregorianCalendar date = new GregorianCalendar();
                     date.setTime(reservation.getNotificationDate());
@@ -121,7 +121,7 @@ public class ScheduledTask {
                     }
                 }
 
-                if (reservation.getStatut().equals(Constantes.MIS_A_DISPO) && !reservation.isNotification()) {
+                if (reservation.getStatut().equals(Constantes.MIS_A_DISPO) && reservation.getNotificationDate() == null) {
                     Utilisateur utilisateur = batchProxy.getUtilisateur(reservation.getUtilisateurId());
                     Bibliotheque bibliotheque = batchProxy.getBibliotheque(exemplaireLivre.getBibliothequeId());
 

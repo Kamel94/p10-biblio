@@ -26,5 +26,4 @@ public class Reservation implements Serializable {
     private Long utilisateurId;
     private Long exemplaireId;
     private String statut;
-    private boolean notification;
 }

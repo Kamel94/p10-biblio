@@ -46,7 +46,7 @@ public class ScheduledTask {
 
                 String dateRetour = formaterDate.dateRetour(pret.getDateRetour());
                 String civilite = "";
-                String msgProlongement = "";
+                String msgProlongement = "\nJe vous informe que malheureusement vous ne pouvez plus prolonger ce prêt.";
                 String destinataire = utilisateur.getEmail();
                 String objet = "Rappel, la date du prêt est arrivée à échéance !";
 
@@ -54,12 +54,6 @@ public class ScheduledTask {
                     civilite = "Mr";
                 } else {
                     civilite = "Mme";
-                }
-
-                if (pret.getProlongation() == 0) {
-                    msgProlongement = "\nJe vous rappelle que, si vous le voulez, vous pouvez prolonger votre prêt.";
-                } else if (pret.getProlongation() == 1) {
-                    msgProlongement = "\nJe vous informe que malheureusement vous ne pouvez plus prolonger ce prêt.";
                 }
 
                 String message = "Bonjour " + civilite + " " + utilisateur.getNom() + "," +

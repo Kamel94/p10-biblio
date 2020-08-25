@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import java.util.Date;
 import java.util.List;
 
 @FeignClient(name = "zuul-server", url = "localhost:8888")
@@ -36,8 +37,8 @@ public interface BatchProxy {
     List<Reservation> getReservationListByStatut(@PathVariable("statut") String statut);
 
     @GetMapping(value = "/pret-service/reservationsByStatutAndNotification/{statut}/{notification}")
-    List<Reservation> getReservationListByStatutAndNotification(@PathVariable("statut") String statut,
-                                                                @PathVariable("notification") boolean notification);
+    List<Reservation> getReservationListByStatutAndNotificationDate(@PathVariable("statut") String statut,
+                                                                @PathVariable("notification") Date notification);
 
     @PutMapping(value = "/pret-service/updateReservation/{id}")
     Reservation updateReservation(@PathVariable("id") long id);

@@ -65,9 +65,9 @@ public class ReservationController {
      * Affiche la liste des réservations de par le statut et la notification.
      */
     @GetMapping(value = "/reservationsByStatutAndNotification/{statut}/{notification}")
-    public List<Reservation> getReservationListByStatutAndNotification(@PathVariable("statut") String statut,
-                                                                       @PathVariable("notification") boolean notification) {
-        return reservationRepository.findAllByStatutAndNotification(statut, notification);
+    public List<Reservation> getReservationListByStatutAndNotificationDate(@PathVariable("statut") String statut,
+                                                                       @PathVariable("notification") Date notification) {
+        return reservationRepository.findAllByStatutAndNotificationDate(statut, notification);
     }
 
     /**
@@ -120,7 +120,6 @@ public class ReservationController {
                     "\nOn vous préviendra une fois que vous pourrez venir le chercher.");
             reservation.setBooking(new Date());
             reservation.setUtilisateurId(utilisateurId);
-            reservation.setNotification(false);
             reservation.setExemplaireId(exemplaireId);
             reservation.setStatut(Constantes.EN_ATTENTE);
 
@@ -143,7 +142,6 @@ public class ReservationController {
     @PutMapping(value = "/updateReservation/{id}")
     public Reservation updateReservation(@PathVariable("id") long id) {
         Reservation reservation = reservationRepository.getOne(id);
-        reservation.setNotification(true);
         reservation.setNotificationDate(new Date());
         return reservationRepository.save(reservation);
     }

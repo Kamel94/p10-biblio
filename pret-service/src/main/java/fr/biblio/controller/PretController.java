@@ -7,9 +7,12 @@ import fr.biblio.configuration.Constantes;
 import fr.biblio.exception.FunctionalException;
 import fr.biblio.dao.ReservationRepository;
 import fr.biblio.entities.Reservation;
+import fr.biblio.exception.FunctionalException;
 import fr.biblio.proxies.PretProxy;
 import fr.biblio.dao.PretRepository;
 import fr.biblio.entities.Pret;
+import fr.biblio.service.ServicePret;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,9 @@ public class PretController {
 
     @Autowired
     private ReservationController reservationController;
+
+    @Autowired
+    private ServicePret servicePret;
 
     @Autowired
     private PretProxy pretProxy;
@@ -243,20 +249,13 @@ public class PretController {
      */
     @PostMapping(value = "/ajoutPret/{utilisateurId}/{exemplaireId}")
     public Pret addPret(@PathVariable("utilisateurId") long utilisateurId,
-                        @PathVariable("exemplaireId") long exemplaireId) {
+                        @PathVariable("exemplaireId") long exemplaireId) throws FunctionalException {
 
-        Pret pret = new Pret();
         Pret pretWithStatutPret = pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, Constantes.PRET);
         Reservation reservationByUtilisateur = reservationRepository.findByUtilisateurIdAndExemplaireId(utilisateurId, exemplaireId);
         ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(exemplaireId);
 
-        if (!exemplaireLivre.isDisponibilite() && pretWithStatutPret == null &&
-                reservationByUtilisateur == null) {
-            log.info("L'exemplaire '" + exemplaireLivre.getLivre().getTitre() + "' n'est pas disponible..." +
-                    "\nMerci de faire une réservation.");
-
-        } else if (exemplaireLivre.isDisponibilite() && pretWithStatutPret == null &&
-                reservationByUtilisateur == null) {
+        if (servicePret.addLoan(exemplaireLivre, pretWithStatutPret, reservationByUtilisateur).equals(Constantes.NOUVEAU_PRET)) {
             exemplaireLivre.setNombreExemplaire(exemplaireLivre.getNombreExemplaire() - 1);
 
             if (exemplaireLivre.getNombreExemplaire() == 0) {
@@ -264,49 +263,15 @@ public class PretController {
             }
             pretProxy.updateExemplaire(exemplaireLivre);
 
-            try {
-                GregorianCalendar date = new GregorianCalendar();
+            return pretRepository.save(servicePret.saveNewPret(utilisateurId, exemplaireLivre.getId()));
 
-                pret.setDatePret(new Date());
-                date.setTime(pret.getDatePret());
-                date.add(GregorianCalendar.DAY_OF_YEAR, + 28);
-                pret.setUtilisateurId(utilisateurId);
-                pret.setDateRetour(date.getTime());
-                pret.setProlongation(0);
-                pret.setExemplaireId(exemplaireLivre.getId());
-                pret.setStatut(Constantes.PRET);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return pretRepository.save(pret);
-
-        } else if (pretWithStatutPret == null && reservationByUtilisateur.getStatut().equals(Constantes.MIS_A_DISPO)) {
+        } else if (servicePret.addLoan(exemplaireLivre, pretWithStatutPret, reservationByUtilisateur).equals(Constantes.MIS_A_DISPO)) {
             log.info("Vous pouvez récupérer votre réservation.");
-            reservationByUtilisateur.setStatut("RECUPERER");
+            reservationByUtilisateur.setStatut(Constantes.RECUPEREE);
             reservationRepository.save(reservationByUtilisateur);
-            try {
-                GregorianCalendar date = new GregorianCalendar();
 
-                pret.setDatePret(new Date());
-                date.setTime(pret.getDatePret());
-                date.add(GregorianCalendar.DAY_OF_YEAR, + 28);
-                pret.setUtilisateurId(utilisateurId);
-                pret.setDateRetour(date.getTime());
-                pret.setProlongation(0);
-                pret.setExemplaireId(exemplaireLivre.getId());
-                pret.setStatut(Constantes.PRET);
+            return pretRepository.save(servicePret.saveNewPret(utilisateurId, exemplaireLivre.getId()));
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return pretRepository.save(pret);
-
-        } else if (pretWithStatutPret != null) {
-            log.info("Vous avez déjà un emprunt en cours sur ce livre.");
-
-        } else if (reservationByUtilisateur != null) {
-            log.info("Vous avez déjà une réservation en cours sur ce livre.");
         }
         return null;
     }

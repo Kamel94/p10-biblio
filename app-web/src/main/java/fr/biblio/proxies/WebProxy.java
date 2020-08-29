@@ -109,4 +109,7 @@ public interface WebProxy {
     Reservation addBooking(@PathVariable("utilisateurId") long utilisateurId,
                            @PathVariable("exemplaireId") long exemplaireId);
 
+    @PutMapping(value = "/pret-service/cancelReservation/{id}")
+    Reservation cancelReservation(@PathVariable("id") long id);
+
 }

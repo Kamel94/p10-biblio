@@ -342,4 +342,14 @@ public class ApplicationController {
         log.info("Le prêt avec l'id " + id + " a été supprimé");
         return "redirect:/usager/reservationsUtilisateur/{utilisateurId}";
     }
+
+    /**
+     * Annule une réservation.
+     */
+    @GetMapping(value = "/cancel/{id}/{utilisateurId}")
+    public String cancel(@PathVariable("id") long id, @PathVariable("utilisateurId") long utilisateurId){
+        webProxy.cancelReservation(id);
+        log.info("La réservation avec l'id " + id + " a été annulée");
+        return "redirect:/usager/reservationsUtilisateur/{utilisateurId}";
+    }
 }

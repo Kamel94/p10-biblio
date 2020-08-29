@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -30,7 +29,7 @@ public class ServicePretTest {
 
     private ServicePret service;
     @Mock
-    private PretRepository pretrepository;
+    private PretRepository pretRepository;
     @Mock
     private ReservationRepository reservationRepository;
     private ExemplaireLivre exemplaireLivre;
@@ -44,7 +43,7 @@ public class ServicePretTest {
 
     @BeforeEach
     public void initMock() {
-        pretrepository = mock(PretRepository.class, RETURNS_DEEP_STUBS);
+        pretRepository = mock(PretRepository.class, RETURNS_DEEP_STUBS);
         reservationRepository = mock(ReservationRepository.class, RETURNS_DEEP_STUBS);
     }
 
@@ -75,7 +74,7 @@ public class ServicePretTest {
     @Test
     public void checkSavePret() {
         // GIVEN
-        when(pretrepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(1), Long.valueOf(1), Constantes.PRET)).thenReturn(pret);
+        when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(1), Long.valueOf(1), Constantes.PRET)).thenReturn(pret);
 
         // WHEN
         service.saveNewPret(pret.getUtilisateurId(), pret.getExemplaireId());
@@ -97,7 +96,7 @@ public class ServicePretTest {
         exemplaireLivre.setDisponibilite(false);
         pret = null;
         reservation = null;
-        when(pretrepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(1), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(null);
+        when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(1), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(null);
         when(reservationRepository.findByUtilisateurIdAndExemplaireId(Long.valueOf(2), exemplaireLivre.getId())).thenReturn(null);
 
         // WHEN
@@ -114,7 +113,7 @@ public class ServicePretTest {
         exemplaireLivre.setDisponibilite(true);
         pret = null;
         reservation = null;
-        when(pretrepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(2), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(null);
+        when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(2), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(null);
         when(reservationRepository.findByUtilisateurIdAndExemplaireId(Long.valueOf(2), exemplaireLivre.getId())).thenReturn(null);
 
         // WHEN
@@ -132,7 +131,7 @@ public class ServicePretTest {
         pret = null;
         reservation.setUtilisateurId(Long.valueOf(2));
         reservation.setStatut(Constantes.MIS_A_DISPO);
-        when(pretrepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(2), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(null);
+        when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(2), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(null);
         when(reservationRepository.findByUtilisateurIdAndExemplaireId(reservation.getUtilisateurId(), exemplaireLivre.getId())).thenReturn(reservation);
 
         // WHEN
@@ -149,7 +148,7 @@ public class ServicePretTest {
         exemplaireLivre.setDisponibilite(true);
         pret.setId(Long.valueOf(1));
         reservation = null;
-        when(pretrepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(2), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(pret);
+        when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(2), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(pret);
         when(reservationRepository.findByUtilisateurIdAndExemplaireId(Long.valueOf(2), exemplaireLivre.getId())).thenReturn(null);
 
         // WHEN
@@ -166,7 +165,7 @@ public class ServicePretTest {
         reservation.setId(Long.valueOf(1));
         reservation.setStatut(Constantes.EN_ATTENTE);
         pret = null;
-        when(pretrepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(2), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(null);
+        when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(2), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(null);
         when(reservationRepository.findByUtilisateurIdAndExemplaireId(Long.valueOf(2), exemplaireLivre.getId())).thenReturn(reservation);
 
         // WHEN
@@ -175,5 +174,4 @@ public class ServicePretTest {
         // THEN
         assertThat(exception.getMessage()).isEqualTo("Vous avez déjà une réservation en cours sur ce livre.");
     }
-
 }

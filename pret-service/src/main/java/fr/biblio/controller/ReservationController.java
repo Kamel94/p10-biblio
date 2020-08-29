@@ -149,9 +149,10 @@ public class ReservationController {
     @PutMapping(value = "/cancelReservation/{id}")
     public Reservation cancelReservation(@PathVariable("id") long id) {
         Reservation reservation = reservationRepository.getOne(id);
+        reservation.setStatut(Constantes.ANNULEE);
+        reservationRepository.save(reservation);
         List<Reservation> reservationList = reservationRepository.findAllByStatutAndExemplaireId(Constantes.EN_ATTENTE, reservation.getExemplaireId());
         ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(reservation.getExemplaireId());
-        reservation.setStatut(Constantes.ANNULEE);
 
         if (!reservationList.isEmpty()) {
             try {
@@ -169,6 +170,6 @@ public class ReservationController {
         }
         pretProxy.updateExemplaire(exemplaireLivre);
 
-        return reservationRepository.save(reservation);
+        return null;
     }
 }

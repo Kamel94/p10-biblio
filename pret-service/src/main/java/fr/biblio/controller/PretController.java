@@ -4,6 +4,7 @@ import fr.biblio.beans.Bibliotheque;
 import fr.biblio.beans.ExemplaireLivre;
 import fr.biblio.beans.LivreBean;
 import fr.biblio.configuration.Constantes;
+import fr.biblio.exception.FunctionalException;
 import fr.biblio.proxies.PretProxy;
 import fr.biblio.dao.PretRepository;
 import fr.biblio.entities.Pret;
@@ -131,9 +132,11 @@ public class PretController {
 
         } else if (pret.getProlongation() == 0 && todayLong >= dateRetourLong) {
             log.info("Vous ne pouvez plus prolonger ce prêt, car la date de retour du prêt est dépassée.");
+            new FunctionalException("Vous ne pouvez plus prolonger ce prêt, car la date de retour du prêt est dépassée.");
 
         } else if (pret.getProlongation() >= 1) {
             log.info("Ce prêt a atteint le nombre maximum de prolongation...");
+            new FunctionalException("Ce prêt a atteint le nombre maximum de prolongation...");
         }
         return null;
     }

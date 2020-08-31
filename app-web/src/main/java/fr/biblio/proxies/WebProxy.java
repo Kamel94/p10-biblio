@@ -32,6 +32,9 @@ public interface WebProxy {
     @GetMapping(value = "/authentification-service/utilisateurByEmail/{email}")
     Utilisateur getUtilisateurWithEmail(@PathVariable("email") String email);
 
+    @GetMapping(value = "/authentification-service/utilisateurByPseudo/{pseudo}")
+    Utilisateur getUtilisateurWithPseudo(@PathVariable("pseudo") String pseudo);
+
     @PostMapping(value = "/authentification-service/ajoutUtilisateur")
     Utilisateur ajouterUtilisateur(@RequestBody Utilisateur utilisateur);
 

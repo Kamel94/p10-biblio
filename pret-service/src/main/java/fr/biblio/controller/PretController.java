@@ -264,14 +264,12 @@ public class PretController {
             pretProxy.updateExemplaire(exemplaireLivre);
 
             return pretRepository.save(servicePret.saveNewPret(utilisateurId, exemplaireLivre.getId()));
-
         } else if (servicePret.addLoan(exemplaireLivre, pretWithStatutPret, reservationByUtilisateur).equals(Constantes.MIS_A_DISPO)) {
             log.info("Vous pouvez récupérer votre réservation.");
             reservationByUtilisateur.setStatut(Constantes.RECUPEREE);
             reservationRepository.save(reservationByUtilisateur);
 
             return pretRepository.save(servicePret.saveNewPret(utilisateurId, exemplaireLivre.getId()));
-
         }
         return null;
     }

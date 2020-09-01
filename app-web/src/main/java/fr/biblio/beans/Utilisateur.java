@@ -19,7 +19,6 @@ public class Utilisateur {
     private String pseudo;
     private long genreId;
     private String email;
-    private String pseudo;
     private String password;
     private String telephone;
     private String adresse;

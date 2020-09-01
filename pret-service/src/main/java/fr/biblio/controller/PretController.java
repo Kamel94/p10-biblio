@@ -4,22 +4,18 @@ import fr.biblio.beans.Bibliotheque;
 import fr.biblio.beans.ExemplaireLivre;
 import fr.biblio.beans.LivreBean;
 import fr.biblio.configuration.Constantes;
-import fr.biblio.exception.FunctionalException;
 import fr.biblio.dao.ReservationRepository;
 import fr.biblio.entities.Reservation;
-import fr.biblio.exception.FunctionalException;
 import fr.biblio.proxies.PretProxy;
 import fr.biblio.dao.PretRepository;
 import fr.biblio.entities.Pret;
 import fr.biblio.service.ServicePret;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 @RestController
@@ -30,9 +26,6 @@ public class PretController {
 
     @Autowired
     private ReservationRepository reservationRepository;
-
-    @Autowired
-    private ReservationController reservationController;
 
     @Autowired
     private ServicePret servicePret;
@@ -86,12 +79,12 @@ public class PretController {
 
         List<Pret> prets = pretRepository.findByUtilisateurIdAndStatut(utilisateurId, Constantes.PRET);
         for (Pret pret : prets) {
-            ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(pret.getExemplaireId());
-            LivreBean livre = pretProxy.getLivre(exemplaireLivre.getLivreId());
-            Bibliotheque bibliotheque = pretProxy.getBibliotheque(exemplaireLivre.getBibliothequeId());
+            ExemplaireLivre exemplaire = pretProxy.getExemplaire(pret.getExemplaireId());
+            LivreBean livre = pretProxy.getLivre(exemplaire.getLivreId());
+            Bibliotheque bibliotheque = pretProxy.getBibliotheque(exemplaire.getBibliothequeId());
 
             pret.setTitreLivre(livre.getTitre());
-            pret.setNumeroSerieExemplaire(exemplaireLivre.getNumeroSerie());
+            pret.setNumeroSerieExemplaire(exemplaire.getNumeroSerie());
             pret.setNomBiblio(bibliotheque.getNom());
         }
         return prets;
@@ -175,34 +168,16 @@ public class PretController {
 
         Pret pret = pretRepository.findById(pretId).get();
         ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(pret.getExemplaireId());
+        List<Reservation> reservationList = reservationRepository.findAllByStatutAndExemplaireId(Constantes.EN_ATTENTE, exemplaireLivre.getId());
 
-        if (pret.getStatut().equals(Constantes.PRET)) {
+        System.out.println("Controller = " + pret.getStatut());
 
-            pretProxy.updateExemplaire(exemplaireLivre);
-            pret.setStatut(Constantes.RENDU);
-            pret.setDateRetour(new Date());
-
-            List<Reservation> reservationList = reservationRepository.findAllByStatutAndExemplaireId(Constantes.EN_ATTENTE, exemplaireLivre.getId());
-
-            if (!reservationList.isEmpty()) {
-                try {
-                    reservationList.get(0).setStatut(Constantes.MIS_A_DISPO);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                reservationRepository.save(reservationList.get(0));
-            } else if (reservationList.isEmpty()) {
-                exemplaireLivre.setNombreExemplaire(exemplaireLivre.getNombreExemplaire() + 1);
-            }
-
-            if (exemplaireLivre.getNombreExemplaire() > 0) {
-                exemplaireLivre.setDisponibilite(true);
-            }
-            pretProxy.updateExemplaire(exemplaireLivre);
-
-        } else {
-            log.info("Ce prêt n'est pas en cours...");
+        servicePret.returnBook(pret, reservationList, exemplaireLivre);
+        if (!reservationList.isEmpty()) {
+            reservationRepository.save(reservationList.get(0));
         }
+        pretProxy.updateExemplaire(exemplaireLivre);
+
         return pretRepository.save(pret);
     }
 
@@ -213,35 +188,8 @@ public class PretController {
     public Pret prolongerPret(@PathVariable("pretId") long pretId) {
 
         Pret pret = pretRepository.findById(pretId).get();
-        Date today = new Date();
-
-        long todayLong = today.getTime();
-        long dateRetourLong = pret.getDateRetour().getTime();
-
-        if (pret.getProlongation() == 0 && todayLong < dateRetourLong) {
-            try {
-                GregorianCalendar date = new GregorianCalendar();
-
-                date.setTime(pret.getDateRetour());
-                date.add(GregorianCalendar.DAY_OF_YEAR, + 28);
-
-                pret.setDateRetour(date.getTime());
-                pret.setProlongation(pret.getProlongation() + 1);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return pretRepository.save(pret);
-
-        } else if (pret.getProlongation() == 0 && todayLong >= dateRetourLong) {
-            log.info("Vous ne pouvez plus prolonger ce prêt, car la date de retour du prêt est dépassée.");
-            throw new FunctionalException("Vous ne pouvez plus prolonger ce prêt, car la date de retour du prêt est dépassée.");
-
-        } else if (pret.getProlongation() >= 1) {
-            log.info("Ce prêt a atteint le nombre maximum de prolongation...");
-            throw new FunctionalException("Ce prêt a atteint le nombre maximum de prolongation...");
-        }
-        return null;
+        servicePret.extendLoan(pret);
+        return pretRepository.save(pret);
     }
 
     /**
@@ -249,29 +197,22 @@ public class PretController {
      */
     @PostMapping(value = "/ajoutPret/{utilisateurId}/{exemplaireId}")
     public Pret addPret(@PathVariable("utilisateurId") long utilisateurId,
-                        @PathVariable("exemplaireId") long exemplaireId) throws FunctionalException {
+                        @PathVariable("exemplaireId") long exemplaireId) {
 
         Pret pretWithStatutPret = pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, Constantes.PRET);
         Reservation reservationByUtilisateur = reservationRepository.findByUtilisateurIdAndExemplaireId(utilisateurId, exemplaireId);
         ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(exemplaireId);
+        Pret pret = new Pret();
 
         if (servicePret.addLoan(exemplaireLivre, pretWithStatutPret, reservationByUtilisateur).equals(Constantes.NOUVEAU_PRET)) {
-            exemplaireLivre.setNombreExemplaire(exemplaireLivre.getNombreExemplaire() - 1);
-
-            if (exemplaireLivre.getNombreExemplaire() == 0) {
-                exemplaireLivre.setDisponibilite(false);
-            }
             pretProxy.updateExemplaire(exemplaireLivre);
-
-            return pretRepository.save(servicePret.saveNewPret(utilisateurId, exemplaireLivre.getId()));
-        } else if (servicePret.addLoan(exemplaireLivre, pretWithStatutPret, reservationByUtilisateur).equals(Constantes.MIS_A_DISPO)) {
-            log.info("Vous pouvez récupérer votre réservation.");
-            reservationByUtilisateur.setStatut(Constantes.RECUPEREE);
-            reservationRepository.save(reservationByUtilisateur);
-
-            return pretRepository.save(servicePret.saveNewPret(utilisateurId, exemplaireLivre.getId()));
+            if (reservationByUtilisateur != null) {
+                reservationRepository.save(reservationByUtilisateur);
+            }
+            pret = servicePret.saveNewPret(utilisateurId, exemplaireId);
         }
-        return null;
+
+        return pretRepository.save(pret);
     }
 
     /**
@@ -281,5 +222,4 @@ public class PretController {
     public Pret delete(@PathVariable("id") long id) {
         return pretRepository.deleteById(id);
     }
-
 }

@@ -17,8 +17,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,7 +50,7 @@ public class ServicePretTest {
     }
 
     @BeforeEach
-    public void initPret() {
+    public void init() {
         service = new ServicePret();
         exemplaireLivre = new ExemplaireLivre();
         reservation = new Reservation();
@@ -60,8 +62,8 @@ public class ServicePretTest {
             pret.setDatePret(new Date());
             date.setTime(pret.getDatePret());
             date.add(GregorianCalendar.DAY_OF_YEAR, + 28);
-            pret.setUtilisateurId(Long.valueOf(1));
             pret.setDateRetour(date.getTime());
+            pret.setUtilisateurId(Long.valueOf(1));
             pret.setProlongation(0);
             pret.setExemplaireId(Long.valueOf(1));
             pret.setStatut(Constantes.PRET);
@@ -69,6 +71,20 @@ public class ServicePretTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        LivreBean livreBean = new LivreBean();
+        livreBean.setId(Long.valueOf(1));
+        livreBean.setTitre("Le livre de Java premier langage");
+
+        reservation.setStatut(Constantes.EN_ATTENTE);
+        reservation.setUtilisateurId(Long.valueOf(1));
+        reservation.setExemplaireId(Long.valueOf(1));
+        reservation.setBooking(new Date());
+        exemplaireLivre.setId(Long.valueOf(1));
+        exemplaireLivre.setBibliothequeId(Long.valueOf(1));
+        exemplaireLivre.setLivreId(Long.valueOf(1));
+        exemplaireLivre.setDisponibilite(false);
+        exemplaireLivre.setLivre(livreBean);
     }
 
     @Test
@@ -84,16 +100,8 @@ public class ServicePretTest {
     }
 
     @Test
-    public void given_Exemplaire_Is_Not_Available() throws FunctionalException {
+    public void given_Exemplaire_When_Is_Not_Available_Then_FunctionalException() throws FunctionalException {
         // GIVEN
-        LivreBean livreBean = new LivreBean();
-        livreBean.setId(Long.valueOf(1));
-        livreBean.setTitre("Le livre de Java premier langage");
-        exemplaireLivre.setId(Long.valueOf(1));
-        exemplaireLivre.setBibliothequeId(Long.valueOf(1));
-        exemplaireLivre.setLivreId(Long.valueOf(1));
-        exemplaireLivre.setLivre(livreBean);
-        exemplaireLivre.setDisponibilite(false);
         pret = null;
         reservation = null;
         when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(1), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(null);
@@ -107,10 +115,11 @@ public class ServicePretTest {
     }
 
     @Test
-    public void given_Exemplaire_Is_Available() throws FunctionalException {
+    public void given_Exemplaire_When_Is_Available_Then_NombreExemplaire_less_one() throws FunctionalException {
         // GIVEN
         exemplaireLivre.setId(Long.valueOf(1));
         exemplaireLivre.setDisponibilite(true);
+        exemplaireLivre.setNombreExemplaire(5);
         pret = null;
         reservation = null;
         when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(2), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(null);
@@ -121,10 +130,11 @@ public class ServicePretTest {
 
         // THEN
         assertThat(ajoutPret).isEqualTo(Constantes.NOUVEAU_PRET);
+        assertThat(exemplaireLivre.getNombreExemplaire()).isEqualTo(4);
     }
 
     @Test
-    public void given_Pret_Is_Null_And_ReservationStatut_IsEqualsTo_MIS_A_DISPO() throws FunctionalException {
+    public void given_Reservation_When_Statut_IsEqualsTo_MIS_A_DISPO_Then_Statut_IsEqualTo_RECUPEREE() throws FunctionalException {
         // GIVEN
         exemplaireLivre.setId(Long.valueOf(1));
         exemplaireLivre.setDisponibilite(true);
@@ -135,14 +145,15 @@ public class ServicePretTest {
         when(reservationRepository.findByUtilisateurIdAndExemplaireId(reservation.getUtilisateurId(), exemplaireLivre.getId())).thenReturn(reservation);
 
         // WHEN
-        String misADispo = service.addLoan(exemplaireLivre, pret, reservation);
+        String ajoutPret = service.addLoan(exemplaireLivre, pret, reservation);
 
         // THEN
-        assertThat(misADispo).isEqualTo(Constantes.MIS_A_DISPO);
+        assertThat(ajoutPret).isEqualTo(Constantes.NOUVEAU_PRET);
+        assertThat(reservation.getStatut()).isEqualTo(Constantes.RECUPEREE);
     }
 
     @Test
-    public void given_Pret_Is_Not_Null() throws FunctionalException {
+    public void given_Pret_When_Is_Not_Null_Then_FunctionalException() throws FunctionalException {
         // GIVEN
         exemplaireLivre.setId(Long.valueOf(1));
         exemplaireLivre.setDisponibilite(true);
@@ -159,7 +170,7 @@ public class ServicePretTest {
     }
 
     @Test
-    public void given_Reservation_Is_Not_Null() throws FunctionalException {
+    public void given_Reservation_When_Is_Not_Null_Then_FunctionalException() throws FunctionalException {
         // GIVEN
         exemplaireLivre.setId(Long.valueOf(1));
         reservation.setId(Long.valueOf(1));
@@ -173,5 +184,96 @@ public class ServicePretTest {
 
         // THEN
         assertThat(exception.getMessage()).isEqualTo("Vous avez déjà une réservation en cours sur ce livre.");
+    }
+
+    @Test
+    public void given_Pret_When_Prolongation_IsEqualTo_0_And_DateRetour_Is_Before_Today_Then_ProlongationPret() {
+        // GIVEN
+        exemplaireLivre.setId(Long.valueOf(1));
+        when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(pret.getUtilisateurId(), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(pret);
+
+        // WHEN
+        service.extendLoan(pret);
+
+        // THEN
+        assertThat(pret.getProlongation()).isEqualTo(1);
+    }
+
+    @Test
+    public void given_Pret_When_Prolongation_IsEqualTo_0_And_DateRetour_Is_EqualTo_Or_After_Today_Then_FunctionalException() throws FunctionalException {
+        // GIVEN
+        exemplaireLivre.setId(Long.valueOf(1));
+        pret.setDateRetour(new Date());
+        when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(pret.getUtilisateurId(), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(pret);
+
+        // WHEN
+        FunctionalException exception = assertThrows(FunctionalException.class, () -> service.extendLoan(pret));
+
+        // THEN
+        assertThat(exception.getMessage()).isEqualTo("Vous ne pouvez plus prolonger ce prêt, car la date de retour du prêt est dépassée.");
+    }
+
+    @Test
+    public void given_Pret_When_Prolongation_IsEqualTo_1_Then_FunctionalException() throws FunctionalException {
+        // GIVEN
+        exemplaireLivre.setId(Long.valueOf(1));
+        pret.setProlongation(1);
+        when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(pret.getUtilisateurId(), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(pret);
+
+        // WHEN
+        FunctionalException exception = assertThrows(FunctionalException.class, () -> service.extendLoan(pret));
+
+        // THEN
+        assertThat(exception.getMessage()).isEqualTo("Ce prêt a atteint le nombre maximum de prolongation...");
+    }
+
+    @Test
+    public void given_Pret_When_Staut_IsEqualTo_PRET_And_ReservationList_Is_Not_Empty_Then_StatutReservation_IsEqualTo_MIS_A_DISPO() {
+        // GIVEN
+        List<Reservation> reservationList = new ArrayList<>();
+
+        reservationList.add(reservation);
+
+        when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(pret.getUtilisateurId(), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(pret);
+        when(reservationRepository.findAllByStatutAndExemplaireId(Constantes.EN_ATTENTE, exemplaireLivre.getId())).thenReturn(reservationList);
+
+        // WHEN
+        service.returnBook(pret, reservationList, exemplaireLivre);
+
+        // THEN
+        assertThat(pret.getStatut()).isEqualTo(Constantes.RENDU);
+        assertThat(reservation.getStatut()).isEqualTo(Constantes.MIS_A_DISPO);
+    }
+
+    @Test
+    public void given_Pret_When_Staut_IsEqualTo_PRET_And_ReservationList_Is_Empty_Then_NombreExemplaire_More_1() {
+        // GIVEN
+        List<Reservation> reservationList = new ArrayList<>();
+        exemplaireLivre.setNombreExemplaire(9);
+
+        when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(pret.getUtilisateurId(), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(pret);
+
+        // WHEN
+        service.returnBook(pret, reservationList, exemplaireLivre);
+
+        // THEN
+        assertThat(pret.getStatut()).isEqualTo(Constantes.RENDU);
+        assertThat(reservationList).isEmpty();
+        assertThat(exemplaireLivre.getNombreExemplaire()).isEqualTo(10);
+    }
+
+    @Test
+    public void given_Pret_When_Staut_Is_Not_EqualTo_PRET_Then_FunctionalException() throws FunctionalException {
+        // GIVEN
+        List<Reservation> reservationList = new ArrayList<>();
+        pret.setStatut(Constantes.RENDU);
+
+        when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(pret.getUtilisateurId(), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(pret);
+
+        // WHEN
+        FunctionalException exception = assertThrows(FunctionalException.class, () -> service.returnBook(pret, reservationList, exemplaireLivre));
+
+        // THEN
+        assertThat(exception.getMessage()).isEqualTo("Ce prêt n'est pas en cours...");
     }
 }

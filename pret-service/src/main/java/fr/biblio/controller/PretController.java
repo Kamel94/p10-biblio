@@ -132,11 +132,11 @@ public class PretController {
 
         } else if (pret.getProlongation() == 0 && todayLong >= dateRetourLong) {
             log.info("Vous ne pouvez plus prolonger ce prêt, car la date de retour du prêt est dépassée.");
-            new FunctionalException("Vous ne pouvez plus prolonger ce prêt, car la date de retour du prêt est dépassée.");
+            throw new FunctionalException("Vous ne pouvez plus prolonger ce prêt, car la date de retour du prêt est dépassée.");
 
         } else if (pret.getProlongation() >= 1) {
             log.info("Ce prêt a atteint le nombre maximum de prolongation...");
-            new FunctionalException("Ce prêt a atteint le nombre maximum de prolongation...");
+            throw new FunctionalException("Ce prêt a atteint le nombre maximum de prolongation...");
         }
         return null;
     }

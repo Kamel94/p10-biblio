@@ -7,6 +7,7 @@ import fr.biblio.dao.ReservationRepository;
 import fr.biblio.entities.Pret;
 import fr.biblio.entities.Reservation;
 import fr.biblio.proxies.PretProxy;
+import fr.biblio.service.ServiceReservation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public class ReservationController {
 
     @Autowired
     private PretProxy pretProxy;
+
+    @Autowired
+    private ServiceReservation serviceReservation;
 
     Logger log = LoggerFactory.getLogger(PretController.class);
 
@@ -66,7 +70,7 @@ public class ReservationController {
      */
     @GetMapping(value = "/reservationsByStatutAndNotification/{statut}/{notification}")
     public List<Reservation> getReservationListByStatutAndNotificationDate(@PathVariable("statut") String statut,
-                                                                       @PathVariable("notification") Date notification) {
+                                                                           @PathVariable("notification") Date notification) {
         return reservationRepository.findAllByStatutAndNotificationDate(statut, notification);
     }
 
@@ -75,7 +79,7 @@ public class ReservationController {
      */
     @GetMapping(value = "/reservationsByStatutNotLikeAndExemplaireId/{statut}/{exemplaireId}")
     public List<Reservation> getReservationListByStatutNotLikeAndExemplaireId(@PathVariable("statut") String statut,
-                                                                       @PathVariable("exemplaireId") long exemplaireId) {
+                                                                              @PathVariable("exemplaireId") long exemplaireId) {
         return reservationRepository.findAllByStatutNotLikeAndExemplaireId(statut, exemplaireId);
     }
 
@@ -93,7 +97,7 @@ public class ReservationController {
      */
     @GetMapping(value = "/reservations/{id}")
     public Reservation getReservation(@PathVariable("id") long id) {
-        return reservationRepository.getOne(id);
+        return reservationRepository.findById(id).get();
     }
 
     /**
@@ -101,75 +105,44 @@ public class ReservationController {
      */
     @PostMapping(value = "/ajoutReservation/{utilisateurId}/{exemplaireId}")
     public Reservation addBooking(@PathVariable("utilisateurId") long utilisateurId,
-                        @PathVariable("exemplaireId") long exemplaireId) {
+                                  @PathVariable("exemplaireId") long exemplaireId) {
 
         Reservation reservation = new Reservation();
-        Reservation reservationByUtilisateur = reservationRepository.findByUtilisateurIdAndExemplaireId(utilisateurId, exemplaireId);
-        ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(exemplaireId);
         List<Pret> pretsByExemplaireId = pretRepository.findByStatutAndExemplaireId(Constantes.PRET, exemplaireId);
         List<Reservation> reservationList = reservationRepository.findAllByStatutAndExemplaireId(Constantes.EN_ATTENTE, exemplaireId);
         Pret pretWithStatutPret = pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, Constantes.PRET);
+        Reservation reservationByUtilisateur = reservationRepository.findByUtilisateurIdAndExemplaireId(utilisateurId, exemplaireId);
+        ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(exemplaireId);
 
-        int nombreExemplaire = exemplaireLivre.getNombreExemplaire() + pretsByExemplaireId.size();
-        System.out.println(nombreExemplaire);
-        System.out.println(reservationList.size());
+        serviceReservation.addBookingService(reservation, exemplaireLivre, reservationList, pretsByExemplaireId, reservationByUtilisateur, pretWithStatutPret, utilisateurId);
 
-        if(nombreExemplaire * 2 > reservationList.size() && pretWithStatutPret == null &&
-                reservationByUtilisateur == null) {
-            log.info("Vous êtes sur la liste d'attente pour le livre '" + exemplaireLivre.getLivre().getTitre() + "'." +
-                    "\nOn vous préviendra une fois que vous pourrez venir le chercher.");
-            reservation.setBooking(new Date());
-            reservation.setUtilisateurId(utilisateurId);
-            reservation.setExemplaireId(exemplaireId);
-            reservation.setStatut(Constantes.EN_ATTENTE);
-
-        } else if (nombreExemplaire * 2 <= reservationList.size() && pretWithStatutPret == null &&
-                reservationByUtilisateur == null) {
-            log.info("Le livre '" + exemplaireLivre.getLivre().getTitre() + "' n'est pas disponible...");
-            System.out.println(nombreExemplaire);
-            return null;
-
-        } else if (pretWithStatutPret != null) {
-            log.info("Vous avez déjà un emprunt en cours sur ce livre.");
-            return null;
-        } else if (reservationByUtilisateur != null) {
-            log.info("Vous avez déjà une réservation en cours sur ce livre.");
-            return null;
-        }
         return reservationRepository.save(reservation);
     }
 
     @PutMapping(value = "/updateReservation/{id}")
     public Reservation updateReservation(@PathVariable("id") long id) {
-        Reservation reservation = reservationRepository.getOne(id);
+        Reservation reservation = reservationRepository.findById(id).get();
         reservation.setNotificationDate(new Date());
         return reservationRepository.save(reservation);
     }
 
     @PutMapping(value = "/cancelReservation/{id}")
     public Reservation cancelReservation(@PathVariable("id") long id) {
-        Reservation reservation = reservationRepository.getOne(id);
+        Reservation reservation = reservationRepository.findById(id).get();
         reservation.setStatut(Constantes.ANNULEE);
         reservationRepository.save(reservation);
+
         List<Reservation> reservationList = reservationRepository.findAllByStatutAndExemplaireId(Constantes.EN_ATTENTE, reservation.getExemplaireId());
         ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(reservation.getExemplaireId());
 
+        serviceReservation.updateStatutOrNombreExemplaire(reservationList, exemplaireLivre);
+
         if (!reservationList.isEmpty()) {
-            try {
-                reservationList.get(0).setStatut(Constantes.MIS_A_DISPO);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
             reservationRepository.save(reservationList.get(0));
-        } else if (reservationList.isEmpty()) {
-            exemplaireLivre.setNombreExemplaire(exemplaireLivre.getNombreExemplaire() + 1);
         }
 
-        if (exemplaireLivre.getNombreExemplaire() > 0) {
-            exemplaireLivre.setDisponibilite(true);
-        }
         pretProxy.updateExemplaire(exemplaireLivre);
 
-        return null;
+        return reservation;
     }
 }

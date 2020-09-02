@@ -3,7 +3,6 @@ package fr.biblio.service;
 import fr.biblio.beans.ExemplaireLivre;
 import fr.biblio.beans.LivreBean;
 import fr.biblio.configuration.Constantes;
-import fr.biblio.controller.PretController;
 import fr.biblio.dao.PretRepository;
 import fr.biblio.dao.ReservationRepository;
 import fr.biblio.entities.Pret;
@@ -26,7 +25,6 @@ import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-//@SpringBootTest
 public class ServicePretTest {
 
     private ServicePret service;
@@ -61,7 +59,7 @@ public class ServicePretTest {
             pret.setId(Long.valueOf(42));
             pret.setDatePret(new Date());
             date.setTime(pret.getDatePret());
-            date.add(GregorianCalendar.DAY_OF_YEAR, + 28);
+            date.add(GregorianCalendar.DAY_OF_YEAR, +28);
             pret.setDateRetour(date.getTime());
             pret.setUtilisateurId(Long.valueOf(1));
             pret.setProlongation(0);

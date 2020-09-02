@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 public class ServicePret {
 
-    Logger log = LoggerFactory.getLogger(PretController.class);
+    Logger log = LoggerFactory.getLogger(ServicePret.class);
 
     public Pret saveNewPret(long utilisateurId, long exemplaireId) {
 
@@ -84,7 +84,7 @@ public class ServicePret {
                 GregorianCalendar date = new GregorianCalendar();
 
                 date.setTime(pret.getDateRetour());
-                date.add(GregorianCalendar.DAY_OF_YEAR, + 28);
+                date.add(GregorianCalendar.DAY_OF_YEAR, +28);
 
                 pret.setDateRetour(date.getTime());
                 pret.setProlongation(pret.getProlongation() + 1);

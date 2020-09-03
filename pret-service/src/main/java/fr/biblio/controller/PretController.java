@@ -204,12 +204,12 @@ public class PretController {
         ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(exemplaireId);
         Pret pret = new Pret();
 
-        if (servicePret.addLoan(exemplaireLivre, pretWithStatutPret, reservationByUtilisateur).equals(Constantes.NOUVEAU_PRET)) {
+        if (servicePret.checkLoan(exemplaireLivre, pretWithStatutPret, reservationByUtilisateur).equals(Constantes.NOUVEAU_PRET)) {
             pretProxy.updateExemplaire(exemplaireLivre);
             if (reservationByUtilisateur != null) {
                 reservationRepository.save(reservationByUtilisateur);
             }
-            pret = servicePret.saveNewPret(utilisateurId, exemplaireId);
+            pret = servicePret.addNewPret(utilisateurId, exemplaireId);
         }
 
         return pretRepository.save(pret);

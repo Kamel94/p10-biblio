@@ -7,9 +7,7 @@ import fr.biblio.dao.ReservationRepository;
 import fr.biblio.entities.Pret;
 import fr.biblio.entities.Reservation;
 import fr.biblio.exception.FunctionalException;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,9 +24,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class ServiceReservationTest {
 
-    private ServiceReservation service;
     @Mock
     private ReservationRepository reservationRepository;
+    private ServiceReservation service;
     private ExemplaireLivre exemplaireLivre;
     private Reservation reservation;
     private static Pret pret;
@@ -85,9 +83,13 @@ public class ServiceReservationTest {
     }
 
     @Test
+    @Tag("updateStatutOrNombreExemplaire")
+    @DisplayName("Donne une réservation annulée et une liste de réservation en attente, vérifie si la liste est vide ou non et " +
+            "doit retourner le statut MIS A DISPO pour le premier de la liste de réservation.")
     public void given_Reservation_When_Canceled_By_User_Then_Statut_Of_The_First_On_The_List_Is_EqualTo_MIS_A_DISPO() {
         // GIVEN
         List<Reservation> reservationList = new ArrayList<>();
+
         Reservation reservationMisADispo = new Reservation();
         reservationMisADispo.setBooking(new Date());
         reservationMisADispo.setExemplaireId(Long.valueOf(1));
@@ -112,6 +114,9 @@ public class ServiceReservationTest {
     }
 
     @Test
+    @Tag("updateStatutOrNombreExemplaire")
+    @DisplayName("Donne une réservation annulée et une liste de réservation en attente, vérifie si la liste est vide ou non et " +
+            "doit retourner le statut EN ATTENTE pour le deuxième de la liste de réservation.")
     public void given_Reservation_When_Canceled_By_User_Then_Statut_Of_The_Second_On_The_List_Is_EqualTo_EN_ATTENTE() {
         // GIVEN
         List<Reservation> reservationList = new ArrayList<>();
@@ -139,78 +144,90 @@ public class ServiceReservationTest {
     }
 
     @Test
+    @Tag("addBookingService")
+    @DisplayName("Donne nombreExemplaire > à la taille de la liste de réservation, vérifie les conditions d'ajout d'une réservation et doit retourner une nouvelle réservation.")
     public void given_Reservation_When_NombreExemplaire_Is_Better_Than_Size_Of_ReservationList_Then_New_Reservation() {
         // GIVEN
         List<Pret> prets = new ArrayList<>();
         List<Reservation> reservationList = new ArrayList<>();
-        Reservation reservation1 = new Reservation();
-        reservation1.setBooking(new Date());
-        reservation1.setExemplaireId(Long.valueOf(1));
-        reservation1.setUtilisateurId(Long.valueOf(2));
-        reservation1.setStatut(Constantes.EN_ATTENTE);
-        reservationList.add(reservation1);
 
-        Reservation reservation2 = new Reservation();
+        Reservation reservationEnAttente = new Reservation();
+        reservationEnAttente.setBooking(new Date());
+        reservationEnAttente.setExemplaireId(Long.valueOf(1));
+        reservationEnAttente.setUtilisateurId(Long.valueOf(2));
+        reservationEnAttente.setStatut(Constantes.EN_ATTENTE);
+
+        reservationList.add(reservationEnAttente);
+
+        Reservation newReservation = new Reservation();
 
         when(reservationRepository.findAllByStatutAndExemplaireId(Constantes.EN_ATTENTE, Long.valueOf(1))).thenReturn(reservationList);
 
         // WHEN
-        service.addBookingService(reservation2, exemplaireLivre, reservationList, prets, null, null, Long.valueOf(1));
+        service.addBookingService(newReservation, exemplaireLivre, reservationList, prets, null, null, Long.valueOf(1));
 
         // THEN
-        assertThat(reservation.getStatut()).isEqualTo(Constantes.EN_ATTENTE);
+        assertThat(newReservation.getStatut()).isEqualTo(Constantes.EN_ATTENTE);
     }
 
     @Test
+    @Tag("addBookingService")
+    @DisplayName("Donne nombreExemplaire <= à la taille de la liste de réservation, vérifie les conditions d'ajout d'une réservation et doit retourner une exception.")
     public void given_Reservation_When_NombreExemplaire_Is_Less_Than_Or_Equal_To_Size_Of_ReservationList_Then_FunctionalException() {
         // GIVEN
         List<Pret> prets = new ArrayList<>();
         List<Reservation> reservationList = new ArrayList<>();
-        Reservation reservation1 = new Reservation();
-        reservation1.setBooking(new Date());
-        reservation1.setExemplaireId(Long.valueOf(1));
-        reservation1.setUtilisateurId(Long.valueOf(2));
-        reservation1.setStatut(Constantes.EN_ATTENTE);
-        reservationList.add(reservation1);
+
+        Reservation reservationEnAttente = new Reservation();
+        reservationEnAttente.setBooking(new Date());
+        reservationEnAttente.setExemplaireId(Long.valueOf(1));
+        reservationEnAttente.setUtilisateurId(Long.valueOf(2));
+        reservationEnAttente.setStatut(Constantes.EN_ATTENTE);
+
+        reservationList.add(reservationEnAttente);
         exemplaireLivre.setNombreExemplaire(0);
 
-        Reservation reservation2 = new Reservation();
+        Reservation newReservation = new Reservation();
 
         when(reservationRepository.findAllByStatutAndExemplaireId(Constantes.EN_ATTENTE, Long.valueOf(1))).thenReturn(reservationList);
 
         // WHEN
         FunctionalException exception = assertThrows(FunctionalException.class, () ->
-                service.addBookingService(reservation2, exemplaireLivre, reservationList, prets, null, null, Long.valueOf(1)));
+                service.addBookingService(newReservation, exemplaireLivre, reservationList, prets, null, null, Long.valueOf(1)));
 
         // THEN
         assertThat(exception.getMessage()).isEqualTo("Le livre '" + exemplaireLivre.getLivre().getTitre() + "' n'est pas disponible...");
     }
 
     @Test
+    @Tag("addBookingService")
+    @DisplayName("Donne prêt existant, vérifie les conditions d'ajout d'une réservation et doit retourner une exception.")
     public void given_Reservation_When_Pret_Is_Not_Null_Then_FunctionalException() {
         // GIVEN
         List<Pret> prets = new ArrayList<>();
         List<Reservation> reservationList = new ArrayList<>();
-        Reservation reservation1 = new Reservation();
+        Reservation newReservation = new Reservation();
 
         // WHEN
         FunctionalException exception = assertThrows(FunctionalException.class, () ->
-                service.addBookingService(reservation1, exemplaireLivre, reservationList, prets, null, pret, Long.valueOf(1)));
+                service.addBookingService(newReservation, exemplaireLivre, reservationList, prets, null, pret, Long.valueOf(1)));
 
         // THEN
         assertThat(exception.getMessage()).isEqualTo("Vous avez déjà un emprunt en cours sur ce livre.");
     }
 
     @Test
+    @Tag("addBookingService")
+    @DisplayName("Donne réservation existante, vérifie les conditions d'ajout d'une réservation et doit retourner une exception.")
     public void given_Reservation_When_Reservation_Is_Not_Null_Then_FunctionalException() {
         // GIVEN
         List<Pret> prets = new ArrayList<>();
         List<Reservation> reservationList = new ArrayList<>();
-        Reservation reservation1 = new Reservation();
+        Reservation newReservation = new Reservation();
 
         // WHEN
         FunctionalException exception = assertThrows(FunctionalException.class, () ->
-                service.addBookingService(reservation1, exemplaireLivre, reservationList, prets, reservation, null, Long.valueOf(1)));
+                service.addBookingService(newReservation, exemplaireLivre, reservationList, prets, reservation, null, Long.valueOf(1)));
 
         // THEN
         assertThat(exception.getMessage()).isEqualTo("Vous avez déjà une réservation en cours sur ce livre.");

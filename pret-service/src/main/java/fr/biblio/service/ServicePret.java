@@ -19,7 +19,7 @@ public class ServicePret {
 
     Logger log = LoggerFactory.getLogger(ServicePret.class);
 
-    public Pret saveNewPret(long utilisateurId, long exemplaireId) {
+    public Pret addNewPret(long utilisateurId, long exemplaireId) {
 
         Pret pret = new Pret();
 
@@ -41,7 +41,7 @@ public class ServicePret {
         return pret;
     }
 
-    public String addLoan(ExemplaireLivre exemplaireLivre, Pret pretWithStatutPret, Reservation reservationByUtilisateur) {
+    public String checkLoan(ExemplaireLivre exemplaireLivre, Pret pretWithStatutPret, Reservation reservationByUtilisateur) {
 
         if (!exemplaireLivre.isDisponibilite() && pretWithStatutPret == null &&
                 reservationByUtilisateur == null) {

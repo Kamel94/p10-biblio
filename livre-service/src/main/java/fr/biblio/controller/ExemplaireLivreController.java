@@ -24,7 +24,7 @@ public class ExemplaireLivreController {
     }
 
     /**
-     * Affiche un exemplaire de par son ID.
+     * Affiche un exemplaire par son ID.
      */
     @GetMapping("/exemplaireLivre/{id}")
     public ExemplaireLivre getExemplaire(@PathVariable("id") long id) {
@@ -35,12 +35,23 @@ public class ExemplaireLivreController {
     }
 
     /**
-     * Affiche un exemplaire de par l'ID du livre.
+     * Affiche une liste d'exemplaire par l'ID du livre.
      */
-    @GetMapping("/exemplaireLivres/{livreId}")
-    public List<ExemplaireLivre> getExemplairesWithLivreId(@PathVariable("livreId") long id) {
+    @GetMapping("/listExemplaireLivres/{livreId}")
+    public List<ExemplaireLivre> getListExemplairesWithLivreId(@PathVariable("livreId") long id) {
 
         List<ExemplaireLivre> exemplaireLivre = livreRepository.findByLivreId(id);
+
+        return exemplaireLivre;
+    }
+
+    /**
+     * Affiche un exemplaire par l'ID du livre.
+     */
+    @GetMapping("/exemplaireLivres/{livreId}")
+    public ExemplaireLivre getExemplaireWithLivreId(@PathVariable("livreId") long id) {
+
+        ExemplaireLivre exemplaireLivre = livreRepository.findExemplaireLivresByLivreId(id);
 
         return exemplaireLivre;
     }

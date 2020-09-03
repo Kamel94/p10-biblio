@@ -1,8 +1,9 @@
 package fr.biblio.job;
 
 import fr.biblio.beans.*;
+import fr.biblio.configuration.Constantes;
 import fr.biblio.proxy.BatchProxy;
-import fr.biblio.service.FormaterDate;
+import fr.biblio.service.FormatDate;
 import fr.biblio.service.SimpleEmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 @Component
@@ -22,7 +26,7 @@ public class ScheduledTask {
     private BatchProxy batchProxy;
 
     @Autowired
-    private FormaterDate formaterDate;
+    private FormatDate formatDate;
 
     @Autowired
     private SimpleEmailService emailService;
@@ -44,9 +48,9 @@ public class ScheduledTask {
                 Livre livre = batchProxy.getLivre(exemplaireLivre.getLivreId());
                 Bibliotheque bibliotheque = batchProxy.getBibliotheque(exemplaireLivre.getBibliothequeId());
 
-                String dateRetour = formaterDate.dateRetour(pret.getDateRetour());
+                String dateRetour = formatDate.patternDate(pret.getDateRetour());
                 String civilite = "";
-                String msgProlongement = "";
+                String msgProlongement = "\nJe vous informe que malheureusement vous ne pouvez plus prolonger ce prêt.";
                 String destinataire = utilisateur.getEmail();
                 String objet = "Rappel, la date du prêt est arrivée à échéance !";
 
@@ -54,12 +58,6 @@ public class ScheduledTask {
                     civilite = "Mr";
                 } else {
                     civilite = "Mme";
-                }
-
-                if (pret.getProlongation() == 0) {
-                    msgProlongement = "\nJe vous rappelle que, si vous le voulez, vous pouvez prolonger votre prêt.";
-                } else if (pret.getProlongation() == 1) {
-                    msgProlongement = "\nJe vous informe que malheureusement vous ne pouvez plus prolonger ce prêt.";
                 }
 
                 String message = "Bonjour " + civilite + " " + utilisateur.getNom() + "," +
@@ -80,6 +78,86 @@ public class ScheduledTask {
             if (retourRetard.isEmpty()) {
                 log.info("****************************************************************************************");
                 log.info("Il n'y a aucun email de rappel à envoyer.");
+                log.info("****************************************************************************************");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Envoie automatiquement des mails aux utilisateurs pour les prévenir de la mis à disposition du livre qu'ils ont réservé.
+     * Si vous voulez programmer l'envoie pour tous les jours à 8h du matin,
+     * vous devez mettre au niveau de cron "0 0 8 ? * *" .
+     */
+    @Scheduled(cron = "* * * ? * *", zone = "Europe/Paris")
+    public void executeTask2() {
+
+        List<Reservation> reservationList = batchProxy.getReservationListByStatutAndNotificationDate(Constantes.MIS_A_DISPO, null);
+        List<Reservation> allReservations = batchProxy.getReservationList();
+
+        try {
+            for (Reservation reservation : allReservations) {
+                ExemplaireLivre exemplaireLivre = batchProxy.getExemplaire(reservation.getExemplaireId());
+                Livre livre = batchProxy.getLivre(exemplaireLivre.getLivreId());
+
+                if (reservation.getStatut().equals(Constantes.MIS_A_DISPO) && reservation.getNotificationDate() != null) {
+
+                    GregorianCalendar date = new GregorianCalendar();
+                    date.setTime(reservation.getNotificationDate());
+                    date.add(GregorianCalendar.DAY_OF_YEAR, + 2);
+                    Date dateLimit = date.getTime();
+                    Date today = new Date();
+
+                    Long todayLong = today.getTime();
+                    Long dateLimitLong = dateLimit.getTime();
+
+                    System.out.println(todayLong);
+                    System.out.println(dateLimitLong);
+
+                    if (todayLong >= dateLimitLong) {
+                        log.info("La mis à disposition du livre '" + livre.getTitre() + "' est annulée car le délai est passé...");
+                        batchProxy.cancelReservation(reservation.getId());
+                    }
+                }
+
+                if (reservation.getStatut().equals(Constantes.MIS_A_DISPO) && reservation.getNotificationDate() == null) {
+                    Utilisateur utilisateur = batchProxy.getUtilisateur(reservation.getUtilisateurId());
+                    Bibliotheque bibliotheque = batchProxy.getBibliotheque(exemplaireLivre.getBibliothequeId());
+
+                    String booking = formatDate.patternDate(reservation.getBooking());
+                    String civilite = "";
+                    String destinataire = utilisateur.getEmail();
+                    String objet = "Mis à disposition !";
+
+                    batchProxy.updateReservation(reservation.getId());
+
+                    if (utilisateur.getGenreId() == 1) {
+                        civilite = "Mr";
+                    } else {
+                        civilite = "Mme";
+                    }
+
+                    String message = "Bonjour " + civilite + " " + utilisateur.getNom() + "," +
+                            "\n\nLe livre " + "''" + livre.getTitre() + "''" +
+                            " de " + livre.getAuteur() +
+                            " que vous avez réservé le " + booking + " est de nouveau disponible." +
+                            "\nMerci de venir le chercher au plus tôt à la bibliothèque " +
+                            "''" + bibliotheque.getNom() + "''" + "." +
+                            "\n" + "Attention ! Vous disposez de 48h pour le récupérer, passé ce délai, il ne vous sera plus réservé." +
+                            "\n\nService de la ville";
+
+                    // envoie du mail
+                    log.info("****************************************************************************************");
+                    log.info("Email envoyé a: " + destinataire);
+                    log.info("****************************************************************************************");
+                    emailService.sendSimpleEmail(destinataire, objet, message);
+                }
+            }
+
+            if (reservationList.isEmpty()) {
+                log.info("****************************************************************************************");
+                log.info("Il n'y a aucun email de mis à disposition à envoyer.");
                 log.info("****************************************************************************************");
             }
         } catch (Exception e) {

@@ -19,6 +19,7 @@ CREATE TABLE public.utilisateur (
     id BIGINT NOT NULL DEFAULT nextval('public.utilisateur_id_seq'),
     nom VARCHAR(30) NOT NULL,
     prenom VARCHAR(30) NOT NULL,
+    pseudo VARCHAR(30) NOT NULL,
     adresse VARCHAR NOT NULL,
     email VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR NOT NULL,

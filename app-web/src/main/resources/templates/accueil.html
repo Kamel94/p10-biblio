@@ -14,9 +14,9 @@
 <body>
 <div layout:fragment="content">
     <div class="mt-3 container-fluid">
-    <strong class="text-info dr"
-          th:if="${#httpServletRequest.remoteUser} != null">Bonjour
-        [[${utilisateur.prenom}]] ! &nbsp; &nbsp;</strong>
+        <a th:if="${utilisateur.id} != 0 and ${utilisateur.statut} == 'USAGER'"
+           th:href="@{/usager/reservationsUtilisateur/{utilisateurId}(utilisateurId=${utilisateur.id})}"
+           class="btn btn-info bord-rond dr">Mes réservations</a>
     <a th:if="${utilisateur.id} != 0 and ${utilisateur.statut} == 'USAGER'"
        th:href="@{/usager/pretUtilisateur/{utilisateurId}(utilisateurId=${utilisateur.id})}"
        class="btn btn-info bord-rond g">Mes emprunts</a>
@@ -26,7 +26,10 @@
     </div>
 <div class="container">
     <h1 class="text-center mt-3 text-primary">
-        Bibliothèques de la ville d'OpenVille
+        Bibliothèque de la ville d'OpenVille <br>
+        <small class="text-info"
+               th:if="${#httpServletRequest.remoteUser} != null">Bonjour
+            [[${utilisateur.prenom}]] ! &nbsp; &nbsp;</small>
     </h1>
     <div class="mt-5">
         <form class="text-primary form-inline" th:action="@{/accueil}"

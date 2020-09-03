@@ -15,4 +15,14 @@ public interface PretRepository extends JpaRepository<Pret, Long> {
     List<Pret> findByUtilisateurIdAndStatut(long utilisateurId, String statut);
 
     List<Pret> findPretByStatutAndDateRetourBefore(String statut, Date date);
+
+    List<Pret> findPretByStatutAndExemplaireIdOrderByDateRetourAsc(String statut, long exemplaireId);
+
+    List<Pret> findByStatutAndExemplaireId(String statut, long exemplaireId);
+
+    Pret findByUtilisateurIdAndExemplaireIdAndStatut(long utilisateurId, long exemplaireId, String statut);
+
+    Pret findByUtilisateurIdAndExemplaireIdAndStatutNotLike(long utilisateurId, long exemplaireId, String statut);
+
+    Pret deleteById(long id);
 }

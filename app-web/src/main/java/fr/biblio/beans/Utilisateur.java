@@ -16,6 +16,7 @@ public class Utilisateur {
     private Long id;
     private String nom;
     private String prenom;
+    private String pseudo;
     private long genreId;
     private String email;
     private String password;

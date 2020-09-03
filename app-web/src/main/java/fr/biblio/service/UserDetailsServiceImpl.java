@@ -29,9 +29,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     Logger log = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Utilisateur utilisateur = compteService.findByEmail(email);
-        if (utilisateur == null) throw new UsernameNotFoundException(email);
+    public UserDetails loadUserByUsername(String pseudo) throws UsernameNotFoundException {
+        Utilisateur utilisateur = compteService.findByPseudo(pseudo);
+        if (utilisateur == null) throw new UsernameNotFoundException(pseudo);
 
         Collection<GrantedAuthority> authorities = new ArrayList<>();
 
@@ -41,9 +41,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             authorities.add(new SimpleGrantedAuthority(utilisateur.getStatut()));
         }
 
-        log.info("email = " + utilisateur.getEmail() + "pass = " + utilisateur.getPassword()
-                + "Statut = " + utilisateur.getStatut());
-
-        return new User(utilisateur.getEmail(), utilisateur.getPassword(), authorities);
+        log.info("pseudo = " + utilisateur.getPseudo() + " pass = " + utilisateur.getPassword()
+                + " Statut = " + utilisateur.getStatut());
+        return new User(utilisateur.getPseudo(), utilisateur.getPassword(), authorities);
     }
 }

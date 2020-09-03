@@ -21,17 +21,12 @@ Vous apprendrez d''abord, à travers des exemples simples en Java, à maîtriser
 TRUNCATE TABLE bibliotheque CASCADE;
 INSERT INTO bibliotheque (id, nom, adresse)
 VALUES
-(1, 'Bibliothèque Moulin', '5 rue Jean Moulin, 96400 Openville'),
-(2, 'Bibliothèque Rouget', '3 avenue Rouget de Lisle, 96400 Openville'),
-(3, 'Bibliothèque de la mairie', '3 rue de la mairie, 96400 Openville');
+(1, 'Bibliothèque de la mairie', '3 rue de la mairie, 96400 Openville');
 
 TRUNCATE TABLE exemplaire_livre CASCADE;
 INSERT INTO exemplaire_livre (id, id_bibliotheque, id_livre, numero_serie, nombre_exemplaire, disponibilite)
 VALUES
 (1, 1, 1, 16546, 5, TRUE),
 (2, 1, 2, 98746, 3, TRUE),
-(3, 2, 3, 6546, 1, TRUE),
-(4, 3, 2, 05456, 8, TRUE),
-(5, 1, 4, 978207, 3, TRUE),
-(6, 2, 4, 854667, 2, TRUE),
-(7, 3, 4, 978755, 5, TRUE);
+(3, 1, 3, 65468, 1, TRUE),
+(4, 1, 4, 97875, 5, TRUE);

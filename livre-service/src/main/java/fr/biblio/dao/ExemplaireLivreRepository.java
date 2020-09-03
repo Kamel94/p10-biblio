@@ -12,4 +12,6 @@ public interface ExemplaireLivreRepository extends JpaRepository<ExemplaireLivre
     List<ExemplaireLivre> findByLivreId(long id);
 
     ExemplaireLivre findExemplaireLivreByLivreIdAndBibliothequeId(long livreId, long bibliothequeId);
+
+    ExemplaireLivre findExemplaireLivresByLivreId(long livreId);
 }

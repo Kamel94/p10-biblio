@@ -1,10 +1,10 @@
-# Projet 7 - Développez le nouveau système d’information de la bibliothèque d’une grande ville
+# Projet 10 - Améliorez le système d’information de la bibliothèque
 
 ## Contenu
 
-Ce projet est un système de gestion des bibliothèques d'une ville.
+Ce projet reprend le projet 7 qui était "un système de gestion de la bibliothèque d'une grande ville", pour lui ajouter des fonctionnalités via des tickets, que vous pouvez retrouver dans les issues de ce dépôt Github.
 
-Il se compose de plusieurs microservices qui communiquent avec les clients (app-web et app-batch), par l'intermédiaire de "zuul", qui est une passerelle (gateway), pour leurs fournir les données dont elles ont besoins.
+Il se compose de plusieurs microservices qui communiquent avec les clients (app-web et app-batch), par l'intermédiaire de "zuul", qui est une passerelle (gateway), pour leur fournir les données dont elles ont besoins.
 
 Il y a deux types de microservices :
 
@@ -12,17 +12,22 @@ Il y a deux types de microservices :
 
     * Livre-service : gère les données des livres, des exemplaires et des bibliothèques.
 
-    * Pret-service : gère les données des prêts.
+    * Pret-service : gère les données des prêts et des réservations.
 
     * Authentification-service : gère les données des utilisateurs et la connexion d'un utilisateur.
 
-    * App-web : permet aux usagers de suivre les prêts de leur ouvrages à travers une interface web:
+    * App-web : permet aux usagers de suivre les prêts et les réservations de leurs ouvrages à travers une interface web :
 
-        * Rechercher des ouvrages et voir le nombre d'exemplaire disponible.
+        * Rechercher des ouvrages et voir le nombre d'exemplaires disponibles.
         * Consulter leurs prêts en cours.
+        * Consulter leurs réservations en cours.
         * Le prêt d'un ouvrage est prolongeable une seule fois. La prolongation ajoute une nouvelle période de prêt(4 semaines) à la période initiale.
+        * Le prêt ne peut être prolongé si la date de retour du prêt est dépassée.
 
-    * App-batch : pour le traitement automatisé qui permettra d'envoyer des mails de relance aux usagers n'ayant pas rendu les livres en fin de période de prêt. L'envoie sera automatique à la fréquence d'un par jour.
+    * App-batch : 
+    
+        * Pour le traitement automatisé qui permettra d'envoyer des mails de relance aux usagers n'ayant pas rendu les livres en fin de période de prêt. L'envoie sera automatique à la fréquence d'un par jour.
+        * Pour envoyer automatiquement un mail de mis à disposition, dès le retour d'un livre, au premier usager qui est sur la liste de réservation d'attente. Ce dernier aura alors 48h pour venir le récupérer, passé ce délai sa réservation sera annulée et le mail sera envoyé au prochain de la liste.
 
 2. #### Edge microservice : 
 
@@ -48,7 +53,7 @@ Il y a deux types de microservices :
 
 ## Bases de données
 
-Il y a 3 bases de données chacune se trouvant dans les microservices :  
+Il y a 3 bases de données chacune se trouvant dans les microservices :
 livre-service, pret-service et authentification-service.
 
 Les scripts SQL présents dans src/main/resources/scripts dans chaque microservice permettent de créer une base de données avec un jeu de données.
@@ -99,19 +104,19 @@ dans le fichier "nom_du_microservice".properties (exemple : pret-service.propert
 
 Une fois l'application démarrée, vous pourrez vous connecter via les utilisateurs enregistrés dans le jeu de données fourni, il faudra utiliser les identifiants et mots de passe suivant :
 
-* identifiant = jeandupont@gmail.com
+* identifiant = ponpon
 * mot de passe = jean
 * statut = USAGER
 
-* identifiant = robertmercier@gmail.com
+* identifiant = roro
 * mot de passe = robert
 * statut = USAGER
 
-* identifiant = patricklaporte@gmail.com *
-* mot de passe = patrick
+* identifiant = memed
+* mot de passe = ahmed
 * statut = USAGER
 
-##### *Pour tester le batch, vous pouvez changer l'adresse mail pour mettre la vôtre à la place dans le jeu de données fourni dans authentification-service.
+##### *Pour tester le batch, vous pouvez changer l'adresse mail, pour mettre la vôtre à la place, dans le jeu de données fourni dans authentification-service.
 
 ---
 
@@ -129,7 +134,7 @@ Pour configurer le batch il faudra :
 
 ### Si vous utilisez un IDE
 
-* récuperez le projet Github en copiant ce lien : https://github.com/Kamel94/p7-biblio.git
+* récupérez le projet Github en copiant ce lien : https://github.com/Kamel94/p7-biblio.git
 
 * ouvrez votre IDE
 
@@ -160,7 +165,7 @@ Pour configurer le batch il faudra :
 
 ### Si vous n'utilisez pas d'IDE
 
-* récuperez le projet Github en copiant ce lien : https://github.com/Kamel94/p7-biblio.git
+* récupérez le projet Github en copiant ce lien : https://github.com/Kamel94/p7-biblio.git
 
 * ouvrez le terminal ou la console, placez-vous dans le dossier où vous voulez déposer le projet
 

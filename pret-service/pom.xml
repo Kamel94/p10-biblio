@@ -5,11 +5,11 @@
 	<parent>
 		<groupId>fr.biblio</groupId>
 		<artifactId>p10-biblio</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 	<groupId>fr.biblio</groupId>
 	<artifactId>pret-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>pret-service</name>
 	<description>Demo project for Spring Boot</description>

@@ -11,7 +11,7 @@
     </parent>
     <groupId>fr.biblio</groupId>
     <artifactId>p10-biblio</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>p10-biblio</name>
     <packaging>pom</packaging>
     <description>Pom parent</description>
@@ -28,47 +28,47 @@
             <dependency>
                 <groupId>fr.biblio</groupId>
                 <artifactId>livre-service</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>fr.biblio</groupId>
                 <artifactId>pret-service</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>authentification-service</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>fr.biblio</groupId>
                 <artifactId>zuul-server</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>fr.biblio</groupId>
                 <artifactId>config-server</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>fr.biblio</groupId>
                 <artifactId>spring-admin</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>fr.biblio</groupId>
                 <artifactId>eureka-server</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>fr.biblio</groupId>
                 <artifactId>app-web</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>fr.biblio</groupId>
                 <artifactId>app-batch</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

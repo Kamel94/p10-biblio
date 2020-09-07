@@ -21,7 +21,10 @@ public class Utilisateur implements Serializable {
     private Long id;
     private String nom;
     private String prenom;
+
+    @Column(unique = true)
     private String pseudo;
+
     @Column(name = "id_genre")
     private long genreId;
 

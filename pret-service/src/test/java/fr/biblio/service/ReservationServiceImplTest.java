@@ -57,6 +57,7 @@ public class ReservationServiceImplTest {
         reservation.setExemplaireId(Long.valueOf(1));
         reservation.setUtilisateurId(Long.valueOf(1));
         reservation.setStatut(Constantes.EN_ATTENTE);
+        reservation.setNotificationDate(null);
 
         exemplaireLivre.setId(Long.valueOf(1));
         exemplaireLivre.setBibliothequeId(Long.valueOf(1));
@@ -151,9 +152,10 @@ public class ReservationServiceImplTest {
         // GIVEN
         List<Pret> prets = new ArrayList<>();
         List<Reservation> reservationList = new ArrayList<>();
+        Date date = new Date();
 
         Reservation reservationEnAttente = new Reservation();
-        reservationEnAttente.setBooking(new Date());
+        reservationEnAttente.setBooking(date);
         reservationEnAttente.setExemplaireId(Long.valueOf(1));
         reservationEnAttente.setUtilisateurId(Long.valueOf(2));
         reservationEnAttente.setStatut(Constantes.EN_ATTENTE);
@@ -169,6 +171,7 @@ public class ReservationServiceImplTest {
 
         // THEN
         assertThat(newReservation.getStatut()).isEqualTo(Constantes.EN_ATTENTE);
+        assertThat(newReservation.getBooking()).isEqualTo(newReservation.getBooking());
     }
 
     @Test

@@ -1,7 +1,7 @@
 package fr.biblio.controller;
 
-import fr.biblio.dao.ExemplaireLivreRepository;
 import fr.biblio.entities.ExemplaireLivre;
+import fr.biblio.service.contract.ExemplaireLivreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,14 +11,14 @@ import java.util.List;
 public class ExemplaireLivreController {
 
     @Autowired
-    private ExemplaireLivreRepository livreRepository;
+    private ExemplaireLivreService exemplaireLivreService;
 
     /**
      * Affiche la liste des exemplaires.
      */
     @GetMapping("/exemplaireLivre")
     public List<ExemplaireLivre> listeDesExemplaires() {
-        List<ExemplaireLivre> exemplaireLivres = livreRepository.findAll();
+        List<ExemplaireLivre> exemplaireLivres = exemplaireLivreService.findAll();
 
         return exemplaireLivres;
     }
@@ -29,7 +29,7 @@ public class ExemplaireLivreController {
     @GetMapping("/exemplaireLivre/{id}")
     public ExemplaireLivre getExemplaire(@PathVariable("id") long id) {
 
-        ExemplaireLivre exemplaireLivre = livreRepository.findById(id).get();
+        ExemplaireLivre exemplaireLivre = exemplaireLivreService.findById(id);
 
         return exemplaireLivre;
     }
@@ -40,7 +40,7 @@ public class ExemplaireLivreController {
     @GetMapping("/listExemplaireLivres/{livreId}")
     public List<ExemplaireLivre> getListExemplairesWithLivreId(@PathVariable("livreId") long id) {
 
-        List<ExemplaireLivre> exemplaireLivre = livreRepository.findByLivreId(id);
+        List<ExemplaireLivre> exemplaireLivre = exemplaireLivreService.findByLivreId(id);
 
         return exemplaireLivre;
     }
@@ -51,7 +51,7 @@ public class ExemplaireLivreController {
     @GetMapping("/exemplaireLivres/{livreId}")
     public ExemplaireLivre getExemplaireWithLivreId(@PathVariable("livreId") long id) {
 
-        ExemplaireLivre exemplaireLivre = livreRepository.findExemplaireLivresByLivreId(id);
+        ExemplaireLivre exemplaireLivre = exemplaireLivreService.findExemplaireLivresByLivreId(id);
 
         return exemplaireLivre;
     }
@@ -62,7 +62,7 @@ public class ExemplaireLivreController {
     @GetMapping("/exemplaireLivres/{livreId}/{bibliothequeId}")
     public ExemplaireLivre getExemplaireWithLivreIdAndBibliothequeId(@PathVariable("livreId") long livreId, @PathVariable("bibliothequeId") long bibliothequeId) {
 
-        ExemplaireLivre exemplaireLivre = livreRepository.findExemplaireLivreByLivreIdAndBibliothequeId(livreId, bibliothequeId);
+        ExemplaireLivre exemplaireLivre = exemplaireLivreService.findExemplaireLivreByLivreIdAndBibliothequeId(livreId, bibliothequeId);
 
         return exemplaireLivre;
     }
@@ -72,7 +72,7 @@ public class ExemplaireLivreController {
      */
     @PostMapping("/ajoutExemplaire")
     public ExemplaireLivre addExemplaire(@RequestBody ExemplaireLivre exemplaireLivre) {
-        return livreRepository.save(exemplaireLivre);
+        return exemplaireLivreService.save(exemplaireLivre);
     }
 
     /**
@@ -80,7 +80,7 @@ public class ExemplaireLivreController {
      */
     @PutMapping(value = "/modifExemplaire")
     public ExemplaireLivre updateExemplaire(@RequestBody ExemplaireLivre exemplaireLivre) {
-        return livreRepository.save(exemplaireLivre);
+        return exemplaireLivreService.save(exemplaireLivre);
     }
 
 }

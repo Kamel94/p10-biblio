@@ -4,14 +4,11 @@ import fr.biblio.beans.Bibliotheque;
 import fr.biblio.beans.ExemplaireLivre;
 import fr.biblio.beans.LivreBean;
 import fr.biblio.configuration.Constantes;
-import fr.biblio.dao.ReservationRepository;
 import fr.biblio.entities.Reservation;
 import fr.biblio.proxies.PretProxy;
-import fr.biblio.dao.PretRepository;
 import fr.biblio.entities.Pret;
-import fr.biblio.service.ServicePret;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import fr.biblio.service.contract.PretService;
+import fr.biblio.service.contract.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,25 +19,20 @@ import java.util.List;
 public class PretController {
 
     @Autowired
-    private PretRepository pretRepository;
+    private ReservationService reservationService;
 
     @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
-    private ServicePret servicePret;
+    private PretService pretService;
 
     @Autowired
     private PretProxy pretProxy;
-
-    Logger log = LoggerFactory.getLogger(PretController.class);
 
     /**
      * Affiche la liste des prêts.
      */
     @GetMapping(value = "/prets")
     public List<Pret> listeDesPrets() {
-        return pretRepository.findAll();
+        return pretService.findAll();
     }
 
     /**
@@ -48,7 +40,7 @@ public class PretController {
      */
     @GetMapping(value = "/prets/{id}")
     public Pret getPret(@PathVariable("id") long id) {
-        return pretRepository.findById(id).get();
+        return pretService.findById(id);
     }
 
     /**
@@ -58,7 +50,7 @@ public class PretController {
     public Pret getPretWithUtilisateurIdAndExemplaireIdAndStatut(@PathVariable("utilisateurId") long utilisateurId,
                                                                  @PathVariable("exemplaireId") long exemplaireId,
                                                                  @PathVariable("statut") String statut) {
-        return pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, statut);
+        return pretService.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, statut);
     }
 
     /**
@@ -68,7 +60,7 @@ public class PretController {
     public Pret getPretWithUtilisateurIdAndExemplaireId(@PathVariable("utilisateurId") long utilisateurId,
                                                         @PathVariable("exemplaireId") long exemplaireId,
                                                         @PathVariable("statut") String statut) {
-        return pretRepository.findByUtilisateurIdAndExemplaireIdAndStatutNotLike(utilisateurId, exemplaireId, statut);
+        return pretService.findByUtilisateurIdAndExemplaireIdAndStatutNotLike(utilisateurId, exemplaireId, statut);
     }
 
     /**
@@ -77,7 +69,7 @@ public class PretController {
     @GetMapping(value = "/pretUtilisateur/{utilisateurId}")
     public List<Pret> getPretsWithUtilisateurId(@PathVariable("utilisateurId") long utilisateurId) {
 
-        List<Pret> prets = pretRepository.findByUtilisateurIdAndStatut(utilisateurId, Constantes.PRET);
+        List<Pret> prets = pretService.findByUtilisateurIdAndStatut(utilisateurId, Constantes.PRET);
         for (Pret pret : prets) {
             ExemplaireLivre exemplaire = pretProxy.getExemplaire(pret.getExemplaireId());
             LivreBean livre = pretProxy.getLivre(exemplaire.getLivreId());
@@ -96,7 +88,7 @@ public class PretController {
     @GetMapping(value = "/pretUtilisateur/{utilisateurId}/{statut}")
     public List<Pret> getPretsWithUtilisateurIdAndStatut(@PathVariable("utilisateurId") long utilisateurId, @PathVariable("statut") String statut) {
 
-        List<Pret> prets = pretRepository.findByUtilisateurIdAndStatut(utilisateurId, statut);
+        List<Pret> prets = pretService.findByUtilisateurIdAndStatut(utilisateurId, statut);
         return prets;
     }
 
@@ -106,7 +98,7 @@ public class PretController {
     @GetMapping(value = "/pretsWithStatutPretAndExemplaireId/{exemplaireId}")
     public List<Pret> getPretsWithStatutPretAndExemplaireId(@PathVariable("exemplaireId") long exemplaireId) {
 
-        List<Pret> prets = pretRepository.findByStatutAndExemplaireId(Constantes.PRET, exemplaireId);
+        List<Pret> prets = pretService.findByStatutAndExemplaireId(Constantes.PRET, exemplaireId);
         for (Pret pret : prets) {
             ExemplaireLivre exemplaire = pretProxy.getExemplaire(pret.getExemplaireId());
             LivreBean livre = pretProxy.getLivre(exemplaire.getLivreId());
@@ -126,7 +118,7 @@ public class PretController {
     @GetMapping(value = "/pretsOrderByDateRetourAsc/{exemplaireId}")
     public List<Pret> getPretsOrderByDateRetourAsc(@PathVariable("exemplaireId") long exemplaireId) {
 
-        List<Pret> prets = pretRepository.findPretByStatutAndExemplaireIdOrderByDateRetourAsc(Constantes.PRET, exemplaireId);
+        List<Pret> prets = pretService.findPretByStatutAndExemplaireIdOrderByDateRetourAsc(Constantes.PRET, exemplaireId);
         return prets;
     }
 
@@ -136,7 +128,7 @@ public class PretController {
     @GetMapping(value = "/pretsWithStatutAndExemplaireId/{statut}/{exemplaireId}")
     public List<Pret> getPretsWithStatutAndExemplaireId(@PathVariable("statut") String statut, @PathVariable("exemplaireId") long exemplaireId) {
 
-        List<Pret> prets = pretRepository.findByStatutAndExemplaireId(statut, exemplaireId);
+        List<Pret> prets = pretService.findByStatutAndExemplaireId(statut, exemplaireId);
         return prets;
     }
 
@@ -146,7 +138,7 @@ public class PretController {
     @GetMapping(value = "/pretsByStatut/{statut}")
     public List<Pret> getPretsByStatut(@PathVariable("statut") String statut) {
 
-        List<Pret> prets = pretRepository.findPretByStatut(statut);
+        List<Pret> prets = pretService.findPretByStatut(statut);
         return prets;
     }
 
@@ -156,7 +148,7 @@ public class PretController {
     @GetMapping(value = "/dateRetourPassee")
     public List<Pret> getPretsFinished() {
         Date date = new Date();
-        List<Pret> prets = pretRepository.findPretByStatutAndDateRetourBefore(Constantes.PRET, date);
+        List<Pret> prets = pretService.findPretByStatutAndDateRetourBefore(Constantes.PRET, date);
         return prets;
     }
 
@@ -166,19 +158,19 @@ public class PretController {
     @PostMapping(value = "/livreRendu/{pretId}")
     public Pret rendreLivre(@PathVariable("pretId") long pretId) {
 
-        Pret pret = pretRepository.findById(pretId).get();
+        Pret pret = pretService.findById(pretId);
         ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(pret.getExemplaireId());
-        List<Reservation> reservationList = reservationRepository.findAllByStatutAndExemplaireId(Constantes.EN_ATTENTE, exemplaireLivre.getId());
+        List<Reservation> reservationList = reservationService.findAllByStatutAndExemplaireId(Constantes.EN_ATTENTE, exemplaireLivre.getId());
 
         System.out.println("Controller = " + pret.getStatut());
 
-        servicePret.returnBook(pret, reservationList, exemplaireLivre);
+        pretService.returnBook(pret, reservationList, exemplaireLivre);
         if (!reservationList.isEmpty()) {
-            reservationRepository.save(reservationList.get(0));
+            reservationService.save(reservationList.get(0));
         }
         pretProxy.updateExemplaire(exemplaireLivre);
 
-        return pretRepository.save(pret);
+        return pretService.save(pret);
     }
 
     /**
@@ -187,9 +179,9 @@ public class PretController {
     @PostMapping(value = "/prolongation/{pretId}")
     public Pret prolongerPret(@PathVariable("pretId") long pretId) {
 
-        Pret pret = pretRepository.findById(pretId).get();
-        servicePret.extendLoan(pret);
-        return pretRepository.save(pret);
+        Pret pret = pretService.findById(pretId);
+        pretService.extendLoan(pret);
+        return pretService.save(pret);
     }
 
     /**
@@ -199,20 +191,20 @@ public class PretController {
     public Pret addPret(@PathVariable("utilisateurId") long utilisateurId,
                         @PathVariable("exemplaireId") long exemplaireId) {
 
-        Pret pretWithStatutPret = pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, Constantes.PRET);
-        Reservation reservationByUtilisateur = reservationRepository.findByUtilisateurIdAndExemplaireId(utilisateurId, exemplaireId);
+        Pret pretWithStatutPret = pretService.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, Constantes.PRET);
+        Reservation reservationByUtilisateur = reservationService.findByUtilisateurIdAndExemplaireId(utilisateurId, exemplaireId);
         ExemplaireLivre exemplaireLivre = pretProxy.getExemplaire(exemplaireId);
         Pret pret = new Pret();
 
-        if (servicePret.checkLoan(exemplaireLivre, pretWithStatutPret, reservationByUtilisateur).equals(Constantes.NOUVEAU_PRET)) {
+        if (pretService.checkLoan(exemplaireLivre, pretWithStatutPret, reservationByUtilisateur).equals(Constantes.NOUVEAU_PRET)) {
             pretProxy.updateExemplaire(exemplaireLivre);
             if (reservationByUtilisateur != null) {
-                reservationRepository.save(reservationByUtilisateur);
+                reservationService.save(reservationByUtilisateur);
             }
-            pret = servicePret.addNewPret(utilisateurId, exemplaireId);
+            pret = pretService.addNewPret(utilisateurId, exemplaireId);
         }
 
-        return pretRepository.save(pret);
+        return pretService.save(pret);
     }
 
     /**
@@ -220,6 +212,6 @@ public class PretController {
      */
     @PostMapping(value = "/delete/{id}")
     public Pret delete(@PathVariable("id") long id) {
-        return pretRepository.deleteById(id);
+        return pretService.deleteById(id);
     }
 }

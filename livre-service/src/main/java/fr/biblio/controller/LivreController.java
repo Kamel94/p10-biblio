@@ -1,9 +1,9 @@
 package fr.biblio.controller;
 
 import fr.biblio.configuration.ApplicationConfiguration;
-import fr.biblio.dao.LivreRepository;
 import fr.biblio.entities.Livre;
 import fr.biblio.exception.LivreIntrouvableException;
+import fr.biblio.service.contract.LivreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import java.util.List;
 public class LivreController {
 
     @Autowired
-    LivreRepository livreRepository;
+    LivreService livreService;
 
     @Autowired
     ApplicationConfiguration appConfiguration;
@@ -28,7 +28,7 @@ public class LivreController {
     @GetMapping(value = "/livres")
     public List<Livre> listeDesLivres() {
 
-        List<Livre> livres = livreRepository.findAll();
+        List<Livre> livres = livreService.findAll();
 
         List<Livre> listeLimitee = livres.subList(0, appConfiguration.getLimiteDeLivres());
 
@@ -45,7 +45,7 @@ public class LivreController {
                                      @RequestParam(name="auteur", defaultValue = "") String auteur,
                                      @RequestParam(name="categorie", defaultValue = "") String categorie) {
 
-        List<Livre> recherche = livreRepository.recherche("%" + titre + "%", "%" + auteur + "%",  "%" + categorie + "%");
+        List<Livre> recherche = livreService.recherche("%" + titre + "%", "%" + auteur + "%",  "%" + categorie + "%");
 
         log.info("Recherche du livre : " + titre + " dont l'auteur est : " + auteur);
 
@@ -58,7 +58,7 @@ public class LivreController {
     @GetMapping(value = "/livres/{id}")
     public Livre getLivre(@PathVariable(name = "id") long id) throws LivreIntrouvableException {
 
-        Livre livre = livreRepository.findById(id).orElse(null);
+        Livre livre = livreService.findById(id);
 
         if(livre == null) {
             throw new LivreIntrouvableException("Le livre avec l'id " + id + " est introuvable...");
@@ -72,6 +72,6 @@ public class LivreController {
      */
     @PostMapping(value = "/ajoutLivre")
     public Livre addLivre(@RequestBody Livre livre) {
-        return livreRepository.save(livre);
+        return livreService.save(livre);
     }
 }

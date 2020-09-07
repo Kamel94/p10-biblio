@@ -2,12 +2,14 @@ package fr.biblio.service;
 
 import fr.biblio.beans.ExemplaireLivre;
 import fr.biblio.beans.LivreBean;
+import fr.biblio.beans.Utilisateur;
 import fr.biblio.configuration.Constantes;
 import fr.biblio.dao.PretRepository;
 import fr.biblio.dao.ReservationRepository;
 import fr.biblio.entities.Pret;
 import fr.biblio.entities.Reservation;
 import fr.biblio.exception.FunctionalException;
+import fr.biblio.service.impl.PretServiceImpl;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,16 +27,17 @@ import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class ServicePretTest {
+public class PretServiceImplTest {
 
     @Mock
     private PretRepository pretRepository;
     @Mock
     private ReservationRepository reservationRepository;
-    private ServicePret service;
+    private PretServiceImpl service;
     private ExemplaireLivre exemplaireLivre;
     private Reservation reservation;
     private static Pret pret;
+    private Utilisateur utilisateur;
 
     @AfterAll
     public static void assignToNull() {
@@ -49,7 +52,7 @@ public class ServicePretTest {
 
     @BeforeEach
     public void init() {
-        service = new ServicePret();
+        service = new PretServiceImpl();
         exemplaireLivre = new ExemplaireLivre();
         reservation = new Reservation();
         pret = new Pret();
@@ -74,15 +77,22 @@ public class ServicePretTest {
         livreBean.setId(Long.valueOf(1));
         livreBean.setTitre("Le livre de Java premier langage");
 
+        reservation.setId(Long.valueOf(12));
         reservation.setStatut(Constantes.EN_ATTENTE);
         reservation.setUtilisateurId(Long.valueOf(1));
         reservation.setExemplaireId(Long.valueOf(1));
         reservation.setBooking(new Date());
+        reservation.setNotificationDate(null);
         exemplaireLivre.setId(Long.valueOf(1));
         exemplaireLivre.setBibliothequeId(Long.valueOf(1));
         exemplaireLivre.setLivreId(Long.valueOf(1));
         exemplaireLivre.setDisponibilite(false);
         exemplaireLivre.setLivre(livreBean);
+
+        utilisateur = new Utilisateur();
+        utilisateur.setId(Long.valueOf(1));
+        utilisateur.setNom("Dupont");
+        utilisateur.setPrenom("Jean");
     }
 
     @Test
@@ -90,7 +100,7 @@ public class ServicePretTest {
     public void checkSavePret() {
         // GIVEN
         Pret newPret = new Pret();
-        when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(Long.valueOf(1), Long.valueOf(1), Constantes.PRET)).thenReturn(null);
+        when(pretRepository.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateur.getId(), exemplaireLivre.getId(), Constantes.PRET)).thenReturn(null);
 
         // WHEN
         newPret = service.addNewPret(Long.valueOf(1), Long.valueOf(1));

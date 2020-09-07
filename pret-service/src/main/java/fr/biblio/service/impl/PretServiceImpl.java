@@ -1,13 +1,15 @@
-package fr.biblio.service;
+package fr.biblio.service.impl;
 
 import fr.biblio.beans.ExemplaireLivre;
 import fr.biblio.configuration.Constantes;
-import fr.biblio.controller.PretController;
+import fr.biblio.dao.PretRepository;
 import fr.biblio.entities.Pret;
 import fr.biblio.entities.Reservation;
 import fr.biblio.exception.FunctionalException;
+import fr.biblio.service.contract.PretService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -15,9 +17,12 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 @Service
-public class ServicePret {
+public class PretServiceImpl implements PretService {
 
-    Logger log = LoggerFactory.getLogger(ServicePret.class);
+    Logger log = LoggerFactory.getLogger(PretServiceImpl.class);
+
+    @Autowired
+    PretRepository repository;
 
     public Pret addNewPret(long utilisateurId, long exemplaireId) {
 
@@ -134,5 +139,60 @@ public class ServicePret {
             log.info("Ce prêt n'est pas en cours...");
             throw new FunctionalException("Ce prêt n'est pas en cours...");
         }
+    }
+
+    @Override
+    public List<Pret> findAll() {
+        return repository.findAll();
+    }
+
+    @Override
+    public List<Pret> findPretByStatut(String statut) {
+        return repository.findPretByStatut(statut);
+    }
+
+    @Override
+    public List<Pret> findByUtilisateurIdAndStatut(long utilisateurId, String statut) {
+        return repository.findByUtilisateurIdAndStatut(utilisateurId, statut);
+    }
+
+    @Override
+    public List<Pret> findByStatutAndExemplaireId(String statut, long exemplaireId) {
+        return repository.findByStatutAndExemplaireId(statut, exemplaireId);
+    }
+
+    @Override
+    public List<Pret> findPretByStatutAndDateRetourBefore(String statut, Date date) {
+        return repository.findPretByStatutAndDateRetourBefore(statut, date);
+    }
+
+    @Override
+    public List<Pret> findPretByStatutAndExemplaireIdOrderByDateRetourAsc(String statut, long exemplaireId) {
+        return repository.findPretByStatutAndExemplaireIdOrderByDateRetourAsc(statut, exemplaireId);
+    }
+
+    @Override
+    public Pret save(Pret pret) {
+        return repository.save(pret);
+    }
+
+    @Override
+    public Pret deleteById(long id) {
+        return repository.deleteById(id);
+    }
+
+    @Override
+    public Pret findById(long id) {
+        return repository.findById(id).get();
+    }
+
+    @Override
+    public Pret findByUtilisateurIdAndExemplaireIdAndStatut(long utilisateurId, long exemplaireId, String statut) {
+        return repository.findByUtilisateurIdAndExemplaireIdAndStatut(utilisateurId, exemplaireId, statut);
+    }
+
+    @Override
+    public Pret findByUtilisateurIdAndExemplaireIdAndStatutNotLike(long utilisateurId, long exemplaireId, String statut) {
+        return repository.findByUtilisateurIdAndExemplaireIdAndStatutNotLike(utilisateurId, exemplaireId, statut);
     }
 }

@@ -7,6 +7,7 @@ import fr.biblio.dao.ReservationRepository;
 import fr.biblio.entities.Pret;
 import fr.biblio.entities.Reservation;
 import fr.biblio.exception.FunctionalException;
+import fr.biblio.service.impl.ReservationServiceImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -22,11 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ServiceReservationTest {
+public class ReservationServiceImplTest {
 
     @Mock
     private ReservationRepository reservationRepository;
-    private ServiceReservation service;
+    private ReservationServiceImpl service;
     private ExemplaireLivre exemplaireLivre;
     private Reservation reservation;
     private static Pret pret;
@@ -43,7 +44,7 @@ public class ServiceReservationTest {
 
     @BeforeEach
     public void init() {
-        service = new ServiceReservation();
+        service = new ReservationServiceImpl();
         reservation = new Reservation();
         pret = new Pret();
         exemplaireLivre = new ExemplaireLivre();

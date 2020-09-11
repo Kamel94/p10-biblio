@@ -7,6 +7,7 @@ import fr.biblio.dao.ReservationRepository;
 import fr.biblio.entities.Pret;
 import fr.biblio.entities.Reservation;
 import fr.biblio.exception.FunctionalException;
+import fr.biblio.service.impl.ReservationServiceImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -22,11 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ServiceReservationTest {
+public class ReservationServiceImplTest {
 
     @Mock
     private ReservationRepository reservationRepository;
-    private ServiceReservation service;
+    private ReservationServiceImpl service;
     private ExemplaireLivre exemplaireLivre;
     private Reservation reservation;
     private static Pret pret;
@@ -43,7 +44,7 @@ public class ServiceReservationTest {
 
     @BeforeEach
     public void init() {
-        service = new ServiceReservation();
+        service = new ReservationServiceImpl();
         reservation = new Reservation();
         pret = new Pret();
         exemplaireLivre = new ExemplaireLivre();
@@ -56,6 +57,7 @@ public class ServiceReservationTest {
         reservation.setExemplaireId(Long.valueOf(1));
         reservation.setUtilisateurId(Long.valueOf(1));
         reservation.setStatut(Constantes.EN_ATTENTE);
+        reservation.setNotificationDate(null);
 
         exemplaireLivre.setId(Long.valueOf(1));
         exemplaireLivre.setBibliothequeId(Long.valueOf(1));
@@ -144,15 +146,34 @@ public class ServiceReservationTest {
     }
 
     @Test
+    @Tag("updateStatutOrNombreExemplaire")
+    @DisplayName("Donne une réservation annulée et une liste de réservation en attente, vérifie si la liste est vide ou non et " +
+            "doit retourner le statut EN ATTENTE pour le deuxième de la liste de réservation.")
+    public void given_Reservation_When_Canceled_By_User_And_ReservatioList_Is_Empty_Then_Add_One_In_NombreExemplaire() {
+        // GIVEN
+        List<Reservation> reservationList = new ArrayList<>();
+
+        when(reservationRepository.findByUtilisateurIdAndExemplaireId(reservation.getUtilisateurId(), reservation.getExemplaireId())).thenReturn(reservation);
+
+        // WHEN
+        service.updateStatutOrNombreExemplaire(reservationList, exemplaireLivre);
+
+        // THEN
+        assertThat(reservationList).isEmpty();
+        assertThat(exemplaireLivre.getNombreExemplaire()).isEqualTo(3);
+    }
+
+    @Test
     @Tag("addBookingService")
     @DisplayName("Donne nombreExemplaire > à la taille de la liste de réservation, vérifie les conditions d'ajout d'une réservation et doit retourner une nouvelle réservation.")
     public void given_Reservation_When_NombreExemplaire_Is_Better_Than_Size_Of_ReservationList_Then_New_Reservation() {
         // GIVEN
         List<Pret> prets = new ArrayList<>();
         List<Reservation> reservationList = new ArrayList<>();
+        Date date = new Date();
 
         Reservation reservationEnAttente = new Reservation();
-        reservationEnAttente.setBooking(new Date());
+        reservationEnAttente.setBooking(date);
         reservationEnAttente.setExemplaireId(Long.valueOf(1));
         reservationEnAttente.setUtilisateurId(Long.valueOf(2));
         reservationEnAttente.setStatut(Constantes.EN_ATTENTE);
@@ -168,6 +189,7 @@ public class ServiceReservationTest {
 
         // THEN
         assertThat(newReservation.getStatut()).isEqualTo(Constantes.EN_ATTENTE);
+        assertThat(newReservation.getBooking()).isEqualTo(newReservation.getBooking());
     }
 
     @Test

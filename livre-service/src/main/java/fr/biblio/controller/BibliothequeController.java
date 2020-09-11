@@ -1,7 +1,7 @@
 package fr.biblio.controller;
 
-import fr.biblio.dao.BibliothequeRepository;
 import fr.biblio.entities.Bibliotheque;
+import fr.biblio.service.contract.BibliothequeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,14 +11,14 @@ import java.util.List;
 public class BibliothequeController {
 
     @Autowired
-    private BibliothequeRepository bibliothequeRepository;
+    private BibliothequeService bibliothequeService;
 
     /**
      * Affiche la liste des bibliothèques.
      */
     @GetMapping(value = "/listeBibliotheques")
     public List<Bibliotheque> listeDesBibliotheques() {
-        List<Bibliotheque> bibliotheques = bibliothequeRepository.findAll();
+        List<Bibliotheque> bibliotheques = bibliothequeService.findAll();
         return bibliotheques;
     }
 
@@ -27,7 +27,7 @@ public class BibliothequeController {
      */
     @GetMapping(value = "/listeBibliotheques/{id}")
     public Bibliotheque getBibliotheque(@PathVariable("id") long id) {
-        return bibliothequeRepository.findById(id).orElse(null);
+        return bibliothequeService.findById(id);
     }
 
     /**
@@ -35,7 +35,7 @@ public class BibliothequeController {
      */
     @PostMapping(value = "/ajoutBibliotheque")
     public Bibliotheque ajouterUneBibliotheque(@RequestBody Bibliotheque bibliotheque) {
-        return bibliothequeRepository.save(bibliotheque);
+        return bibliothequeService.save(bibliotheque);
     }
 
 }

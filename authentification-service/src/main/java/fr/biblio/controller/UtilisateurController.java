@@ -1,11 +1,8 @@
 package fr.biblio.controller;
 
-import fr.biblio.dao.UtilisateurRepository;
 import fr.biblio.entities.Utilisateur;
+import fr.biblio.service.contract.UtilisateurService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,25 +11,14 @@ import java.util.List;
 public class UtilisateurController {
 
     @Autowired
-    private UtilisateurRepository utilisateurRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    /**
-     * Pour encoder le mot de passe de l'utilisateur.
-     */
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    private UtilisateurService utilisateurService;
 
     /**
      * Affiche la liste des utilisateurs.
      */
     @GetMapping(value = "/listeUtilisateurs")
     public List<Utilisateur> listeUtilisateurs() {
-        return utilisateurRepository.findAll();
+        return utilisateurService.findAll();
     }
 
     /**
@@ -40,7 +26,7 @@ public class UtilisateurController {
      */
     @GetMapping(value = "/utilisateur/{id}")
     public Utilisateur getUtilisateur(@PathVariable("id") long id) {
-        return utilisateurRepository.findById(id).orElse(null);
+        return utilisateurService.findById(id);
     }
 
     /**
@@ -48,7 +34,7 @@ public class UtilisateurController {
      */
     @GetMapping(value = "/utilisateurByEmail/{email}")
     public Utilisateur getUtilisateurWithEmail(@PathVariable("email") String email) {
-        return utilisateurRepository.findByEmail(email);
+        return utilisateurService.findByEmail(email);
     }
 
     /**
@@ -56,7 +42,7 @@ public class UtilisateurController {
      */
     @GetMapping(value = "/utilisateurByPseudo/{pseudo}")
     public Utilisateur getUtilisateurWithPseudo(@PathVariable("pseudo") String pseudo) {
-        return utilisateurRepository.findByPseudo(pseudo);
+        return utilisateurService.findByPseudo(pseudo);
     }
 
     /**
@@ -64,11 +50,7 @@ public class UtilisateurController {
      */
     @PostMapping(value = "/ajoutUtilisateur")
     public Utilisateur ajouterUtilisateur(@RequestBody Utilisateur utilisateur) {
-
-        String passEncoder = passwordEncoder.encode(utilisateur.getPassword());
-        utilisateur.setPassword(passEncoder);
-
-        return utilisateurRepository.save(utilisateur);
+        return utilisateurService.save(utilisateur);
     }
 
 }

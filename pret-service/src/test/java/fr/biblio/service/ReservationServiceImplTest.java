@@ -146,6 +146,24 @@ public class ReservationServiceImplTest {
     }
 
     @Test
+    @Tag("updateStatutOrNombreExemplaire")
+    @DisplayName("Donne une réservation annulée et une liste de réservation en attente, vérifie si la liste est vide ou non et " +
+            "doit retourner le statut EN ATTENTE pour le deuxième de la liste de réservation.")
+    public void given_Reservation_When_Canceled_By_User_And_ReservatioList_Is_Empty_Then_Add_One_In_NombreExemplaire() {
+        // GIVEN
+        List<Reservation> reservationList = new ArrayList<>();
+
+        when(reservationRepository.findByUtilisateurIdAndExemplaireId(reservation.getUtilisateurId(), reservation.getExemplaireId())).thenReturn(reservation);
+
+        // WHEN
+        service.updateStatutOrNombreExemplaire(reservationList, exemplaireLivre);
+
+        // THEN
+        assertThat(reservationList).isEmpty();
+        assertThat(exemplaireLivre.getNombreExemplaire()).isEqualTo(3);
+    }
+
+    @Test
     @Tag("addBookingService")
     @DisplayName("Donne nombreExemplaire > à la taille de la liste de réservation, vérifie les conditions d'ajout d'une réservation et doit retourner une nouvelle réservation.")
     public void given_Reservation_When_NombreExemplaire_Is_Better_Than_Size_Of_ReservationList_Then_New_Reservation() {

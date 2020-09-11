@@ -93,19 +93,18 @@ public class ScheduledTask {
     @Scheduled(cron = "* * * ? * *", zone = "Europe/Paris")
     public void executeTask2() {
 
-        List<Reservation> reservationList = batchProxy.getReservationListByStatutAndNotificationDate(Constantes.MIS_A_DISPO, null);
-        List<Reservation> allReservations = batchProxy.getReservationList();
+        List<Reservation> allReservationsMisADispo = batchProxy.getReservationListByStatut(Constantes.MIS_A_DISPO);
 
         try {
-            for (Reservation reservation : allReservations) {
+            for (Reservation reservation : allReservationsMisADispo) {
                 ExemplaireLivre exemplaireLivre = batchProxy.getExemplaire(reservation.getExemplaireId());
                 Livre livre = batchProxy.getLivre(exemplaireLivre.getLivreId());
 
-                if (reservation.getStatut().equals(Constantes.MIS_A_DISPO) && reservation.getNotificationDate() != null) {
+                if (reservation.getNotificationDate() != null) {
 
                     GregorianCalendar date = new GregorianCalendar();
                     date.setTime(reservation.getNotificationDate());
-                    date.add(GregorianCalendar.DAY_OF_YEAR, + 2);
+                    date.add(GregorianCalendar.DAY_OF_YEAR, + Constantes.TWO_DAYS);
                     Date dateLimit = date.getTime();
                     Date today = new Date();
 
@@ -121,7 +120,7 @@ public class ScheduledTask {
                     }
                 }
 
-                if (reservation.getStatut().equals(Constantes.MIS_A_DISPO) && reservation.getNotificationDate() == null) {
+                if (reservation.getNotificationDate() == null) {
                     Utilisateur utilisateur = batchProxy.getUtilisateur(reservation.getUtilisateurId());
                     Bibliotheque bibliotheque = batchProxy.getBibliotheque(exemplaireLivre.getBibliothequeId());
 
@@ -152,13 +151,11 @@ public class ScheduledTask {
                     log.info("Email envoyé a: " + destinataire);
                     log.info("****************************************************************************************");
                     emailService.sendSimpleEmail(destinataire, objet, message);
+                } else {
+                    log.info("****************************************************************************************");
+                    log.info("Il n'y a aucun email de mis à disposition à envoyer.");
+                    log.info("****************************************************************************************");
                 }
-            }
-
-            if (reservationList.isEmpty()) {
-                log.info("****************************************************************************************");
-                log.info("Il n'y a aucun email de mis à disposition à envoyer.");
-                log.info("****************************************************************************************");
             }
         } catch (Exception e) {
             e.printStackTrace();

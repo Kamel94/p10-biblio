@@ -165,7 +165,7 @@ public class PretServiceImplTest {
 
         // THEN
         assertThat(ajoutPret).isEqualTo(Constantes.NOUVEAU_PRET);
-        assertThat(reservation.getStatut()).isEqualTo(Constantes.RECUPEREE);
+        assertThat(reservation.getStatut()).isEqualTo(Constantes.ANNULEE);
     }
 
     @Test

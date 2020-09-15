@@ -10,5 +10,5 @@ INSERT INTO reservation (id, booking, utilisateur_id, exemplaire_id, statut, not
 VALUES
 (1, '2020/08/21', 1, 3, 'EN ATTENTE', null),
 (2, '2020/08/24', 2, 3, 'MIS A DISPO', null),
-(3, '2020/08/28', 3, 1, 'RECUPEREE', '2020/08/30'),
+(3, '2020/08/28', 3, 1, 'ANNULEE', '2020/08/30'),
 (4, '2020/08/28', 2, 2, 'ANNULEE', null);

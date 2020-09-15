@@ -94,9 +94,13 @@
                        th:href="@{/usager/ajoutReservation/{utilisateurId}/{exemplaireId}/{livreId}(utilisateurId=${utilisateur.id}, exemplaireId=${exemplaire.id}, livreId=${livre.id})}">
                         Réserver</a>
                     <a class="disabled btn btn-danger btn-titre rond-lege btn-sm"
-                       th:if="${utilisateur.id} != 0 and ${nombreExemplaire} > ${reservationList.size()} and ${reservation.statut} != 'ANNULEE' and (${p.utilisateurId} == ${utilisateur.id} or
-                       ${reservation.utilisateurId} == ${utilisateur.id})">
+                       th:if="${utilisateur.id} != 0 and ${nombreExemplaire} > ${reservationList.size()} and ${reservation.statut} != 'ANNULEE' and
+                       ${reservation.utilisateurId} == ${utilisateur.id}">
                         Déjà réservé
+                    </a>
+                    <a class="disabled btn btn-danger btn-titre rond-lege btn-sm"
+                       th:if="${utilisateur.id} != 0 and ${nombreExemplaire} > ${reservationList.size()} and ${p.utilisateurId} == ${utilisateur.id}">
+                        Emprunt en cours
                     </a>
                     <a class="disabled btn btn-danger btn-titre rond-lege btn-sm"
                        th:if="${utilisateur.id} != 0 and ${nombreExemplaire} <= ${reservationList.size()} and (${p.utilisateurId} == ${utilisateur.id} or

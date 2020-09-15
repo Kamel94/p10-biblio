@@ -65,7 +65,7 @@ public class PretServiceImpl implements PretService {
 
         } else if (reservationByUtilisateur != null && reservationByUtilisateur.getStatut().equals(Constantes.MIS_A_DISPO)) {
             log.info("Vous pouvez récupérer votre réservation.");
-            reservationByUtilisateur.setStatut(Constantes.RECUPEREE);
+            reservationByUtilisateur.setStatut(Constantes.ANNULEE);
 
         } else if (pretWithStatutPret != null) {
             log.info("Vous avez déjà un emprunt en cours sur ce livre.");

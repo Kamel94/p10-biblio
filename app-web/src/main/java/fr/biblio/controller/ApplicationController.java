@@ -270,7 +270,7 @@ public class ApplicationController {
     /**
      * Permet aux usagers de prolonger un emprunt.
      */
-    @PostMapping(value = "/prolongation/{pretId}/{utilisateurId}")
+    @GetMapping(value = "/prolongation/{pretId}/{utilisateurId}")
     public String prolongation(@PathVariable("pretId") long pretId,
                                @PathVariable("utilisateurId") long utilisateurId) {
 
